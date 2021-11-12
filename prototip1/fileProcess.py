@@ -10,7 +10,6 @@ class FileProcess():
     def setPath(self, filePath):
         os.chdir(filePath)
         self.path = filePath
-        
 
     def setFileName (self, fileName):
         self.FileName = fileName

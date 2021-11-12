@@ -2,9 +2,7 @@ from fileProcess import FileProcess
 import cv2
 from datetime import datetime
 import time
-
 import os
-
 
 class videoProcess():
     
@@ -12,17 +10,14 @@ class videoProcess():
         self.path = ""
         self.createDataFolder()
 
-
     def createVideoName(self):
         date = datetime.now()
         year = datetime.strftime(date, '%Y')
         month = datetime.strftime(date, '%m')
         day = datetime.strftime(date, '%d')
         hour = datetime.strftime(date, '%X')
-
-        videoName = year, month, day,hour
-        videoName = "-".join(videoName)
-
+        videoName = "{}-{}-{}-{}".format(year, month, day,hour)
+        
         return videoName
 
     def createDataFolder(self):
@@ -38,12 +33,16 @@ class videoProcess():
         frame_height = int(video.get(4))
         size = (frame_width, frame_height)
         
-        videoName = self.createVideoName() + videoFormat
-        result = cv2.VideoWriter(os.path.join(self.path, videoName), cv2.VideoWriter_fourcc(*'MP4V'),20.0, size)
+        fileName = self.createVideoName() + videoFormat
+        print(type(fileName))
+        print(fileName)
+        
+        result = cv2.VideoWriter("2021-11-12-16:46:24.mp4",
+                                cv2.VideoWriter_fourcc(*'MP4V'),
+                                20.0,size)
         
         start = time.time()
         while(int(time.time() - start) < videoDuration):
-
             now = int (time.time() - start)
             ret, frame = video.read()
 
