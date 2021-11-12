@@ -3,6 +3,8 @@ import cv2
 from datetime import datetime
 import time
 
+import os
+
 
 class videoProcess():
     
@@ -11,7 +13,7 @@ class videoProcess():
         self.createDataFolder()
 
 
-    def createVideoName():
+    def createVideoName(self):
         date = datetime.now()
         year = datetime.strftime(date, '%Y')
         month = datetime.strftime(date, '%m')
@@ -30,15 +32,15 @@ class videoProcess():
         fs.setPath(fs.get_current_path_os() + "/" + mainDirectory)
         self.path = fs.get_current_path_os()
 
-    def captureVideo(self, videoName, videoFormat, videoDuration):
+    def captureVideo(self, videoFormat, videoDuration):
         video = cv2.VideoCapture(0)
         frame_width = int(video.get(3))
         frame_height = int(video.get(4))
         size = (frame_width, frame_height)
-
-        result = cv2.VideoWriter(videoName + videoFormat, 
-                                cv2.VideoWriter_fourcc(*'MJPG'),
-                                10, size)
+        
+        videoName = self.createVideoName() + videoFormat
+        result = cv2.VideoWriter(os.path.join(self.path, videoName), cv2.VideoWriter_fourcc(*'MP4V'),20.0, size)
+        
         start = time.time()
         while(int(time.time() - start) < videoDuration):
 
@@ -54,4 +56,5 @@ class videoProcess():
 
 if __name__ == '__main__':
     a = videoProcess()
-    a.save_video_file()
+    a.captureVideo(".mp4", 1)
+
