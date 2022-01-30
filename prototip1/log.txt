@@ -1,5 +1,0 @@
-2022-01-13 22:30:58,800 - DEBUG - Debug mesaji
-2022-01-13 22:30:58,800 - INFO - info mesaji
-2022-01-13 22:30:58,800 - WARNING - warning mesaji
-2022-01-13 22:30:58,800 - ERROR - error mesaji
-2022-01-13 22:30:58,800 - CRITICAL - kritik hata mesaji
