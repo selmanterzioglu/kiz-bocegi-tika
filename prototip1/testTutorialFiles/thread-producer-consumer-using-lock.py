@@ -22,19 +22,7 @@ def consumer(pipeline):
     while message is not SENTINEL:
         message = pipeline.get_message("Consumer")
         if message is not SENTINEL:
-            logging.info("COnsumer storing message: %s", message)
-
-
-if  __name__ == "__main__":
-    format = "%(asctime)s: %(message)s"
-    logging.basicConfig(format = format, level=logging.INFO,
-                        datefmt=format)
-    
-    pipeline = PipeLine()
-
-    with concurrent.futures.ThreadPoolExecutor(max_workers=2) as executor:
-        executor.submit(producer, pipeline)
-        executor.submit(consumer, pipeline)
+            logging.info("Consumer storing message: %s", message)
 
 
 class Pipeline:
@@ -64,3 +52,15 @@ class Pipeline:
         self.consumer_lock.release()
         logging.debug("%s: getlock released ", name)
         
+
+
+if  __name__ == "__main__":
+    format = "%(asctime)s: %(message)s"
+
+    logging.basicConfig(format = format, level=logging.INFO)
+    logging.info("test")
+    pipeline = Pipeline()
+
+    with concurrent.futures.ThreadPoolExecutor(max_workers=2) as executor:
+        executor.submit(producer, pipeline)
+        executor.submit(consumer, pipeline)
