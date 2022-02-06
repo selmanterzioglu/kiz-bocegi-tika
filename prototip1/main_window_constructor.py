@@ -1,44 +1,37 @@
 from PyQt5.QtWidgets import *
-from numpy import uint
-from main_window import Ui_MainWindow
+from PyQt5 import uic
 import sys
-import threading
-import time
+import cv2
+import numpy as np
 
-
-class Window(QMainWindow):
-    
+class MyWindow(QMainWindow):
     def __init__(self):
-        super().__init__()
-        self.ui = Ui_MainWindow()
-        self.ui.setupUi(self)
+        super(MyWindow, self).__init__()
+        
+        uic.loadUi('main_window.ui', self)
+        self.show()
 
-    
-    def timer(self):
-        timer = 10
-        while timer>0:
-            
-            print("{}".format(timer))
-
-            time.sleep(1)
-            timer -=1
 
     def clicked_function(self):
-        # self.ui.label2.setText("test")
-        thread1 = threading.Thread(target=self.set_text, daemon=True)
-        thread2 = threading.Thread(target=self.timer, daemon=True)    
+        print("test")
 
-        thread1.start()
-        thread2.start()
+        img = cv2.imread("test.png", 0)
+        # a = Graphics_View(self.frame_1)
+        
+        # cv2.imshow(img)
+        # cv2.waitKey(0)
+        # cv2.destroyAllWindows()
+      
+class Graphics_View(QGraphicsView): 
+    def __init__(self, *args, parent=None, obj=None, **kwargs):
+        super(Graphics_View, self).__init__(*args, **kwargs)
+        self.current_Frame = None
+        self.setScene(QGraphicsScene(parent=parent))
+        
+    def set_Scene(self, parent=None, scene=None):
+        self.setScene(QGraphicsScene(parent=parent) if scene is None else scene)
 
-
-    def set_text(self):
-        print("clicked! this is a test function!")
-        self.ui.label.setText("test")
-
-
-if __name__ == "__main__":
+if __name__ == '__main__':
     app = QApplication(sys.argv)
-    win = Window()
-    win.show()
-    app.exec_()
+    window = MyWindow()
+    sys.exit(app.exec_())

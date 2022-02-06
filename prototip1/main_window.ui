@@ -6,78 +6,71 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>800</width>
-    <height>600</height>
+    <width>1100</width>
+    <height>775</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralwidget">
+   <widget class="QPushButton" name="button">
+    <property name="geometry">
+     <rect>
+      <x>920</x>
+      <y>260</y>
+      <width>151</width>
+      <height>91</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>tıkla</string>
+    </property>
+   </widget>
+   <widget class="QWidget" name="layoutWidget">
+    <property name="geometry">
+     <rect>
+      <x>70</x>
+      <y>40</y>
+      <width>831</width>
+      <height>621</height>
+     </rect>
+    </property>
+    <layout class="QGridLayout" name="gridLayout">
+     <item row="0" column="0">
+      <widget class="QGraphicsView" name="frame_1">
+       <property name="sceneRect">
+        <rectf>
+         <x>0.000000000000000</x>
+         <y>0.000000000000000</y>
+         <width>0.000000000000000</width>
+         <height>0.000000000000000</height>
+        </rectf>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QGraphicsView" name="frame_2"/>
+     </item>
+     <item row="1" column="0">
+      <widget class="QGraphicsView" name="frame_3"/>
+     </item>
+     <item row="1" column="1">
+      <widget class="QGraphicsView" name="frame_4"/>
+     </item>
+    </layout>
+   </widget>
    <widget class="QLabel" name="label">
     <property name="geometry">
      <rect>
-      <x>650</x>
-      <y>100</y>
-      <width>98</width>
-      <height>26</height>
+      <x>970</x>
+      <y>120</y>
+      <width>80</width>
+      <height>21</height>
      </rect>
     </property>
     <property name="text">
      <string>TextLabel</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="pushButton">
-    <property name="geometry">
-     <rect>
-      <x>640</x>
-      <y>180</y>
-      <width>130</width>
-      <height>37</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>degistir</string>
-    </property>
-   </widget>
-   <widget class="QGraphicsView" name="graphicsView">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>20</y>
-      <width>256</width>
-      <height>192</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QGraphicsView" name="graphicsView_2">
-    <property name="geometry">
-     <rect>
-      <x>300</x>
-      <y>20</y>
-      <width>256</width>
-      <height>192</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QGraphicsView" name="graphicsView_3">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>250</y>
-      <width>256</width>
-      <height>192</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QGraphicsView" name="graphicsView_4">
-    <property name="geometry">
-     <rect>
-      <x>290</x>
-      <y>250</y>
-      <width>256</width>
-      <height>192</height>
-     </rect>
     </property>
    </widget>
   </widget>
@@ -86,28 +79,27 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>800</width>
-     <height>22</height>
+     <width>1100</width>
+     <height>26</height>
     </rect>
    </property>
   </widget>
-  <widget class="QStatusBar" name="statusbar"/>
  </widget>
  <resources/>
  <connections>
   <connection>
-   <sender>pushButton</sender>
+   <sender>button</sender>
    <signal>clicked()</signal>
    <receiver>MainWindow</receiver>
    <slot>clicked_function()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>371</x>
-     <y>377</y>
+     <x>1000</x>
+     <y>295</y>
     </hint>
     <hint type="destinationlabel">
-     <x>575</x>
-     <y>343</y>
+     <x>993</x>
+     <y>185</y>
     </hint>
    </hints>
   </connection>
