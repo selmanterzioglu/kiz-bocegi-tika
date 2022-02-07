@@ -20,8 +20,6 @@ from structure_data import Structure_Buffer
 # CONFIGURATIONS
 MAX_SUBWINDOW = 2
 
-
-
 ### ### ### ### ### ## ## ## ### ### ### ### ###
 ### ### ### CAMERA UI CONFIGURATIONS ### ### ###
 ### ### ### ### ### ## ## ## ### ### ### ### ###
