@@ -16,10 +16,10 @@ app_path = sys.path[0]
 """
 sys.path.append("lera-developer-framework")
 """
-sys.path.append(home + "/Workspace/lera-developer-framework")
+sys.path.append(home + "/Desktop/Workspace/lera-developer-framework")
 
 print("OS Name:", os_name)
-#print("HOME PATH:", home)
-#print("RUN PATH:", run_path)
-#print("APP PATH:", app_path)
-#print("PATH Variables:", sys.path)
+print("HOME PATH:", home)
+print("RUN PATH:", run_path)
+print("APP PATH:", app_path)
+print("PATH Variables:", sys.path)
