@@ -202,6 +202,19 @@
      </item>
     </layout>
    </widget>
+   <widget class="QPushButton" name="remove_camera_button">
+    <property name="geometry">
+     <rect>
+      <x>860</x>
+      <y>310</y>
+      <width>171</width>
+      <height>81</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Remove Camera</string>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
@@ -209,7 +222,7 @@
      <x>0</x>
      <y>0</y>
      <width>1155</width>
-     <height>27</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
