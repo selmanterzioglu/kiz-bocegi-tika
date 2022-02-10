@@ -5,7 +5,7 @@ from main_window_constructor import Ui_Camera_API_Developer
 
 if __name__ == "__main__":
     app, ui = init_and_run_UI(
-        "Camera Developer UI",
+        "Kız Böcegi TIKA Kontrol Yazilimi",
         Ui_Camera_API_Developer,
         UI_File_Path="main_window.ui"
     )
