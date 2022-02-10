@@ -4,11 +4,12 @@ import logging
 from PyQt5.QtWidgets import *
 from PyQt5 import uic
 from PyQt5.QtGui import QImage, QPixmap
-from structure_ui import Structure_UI
+from structure_ui import Structure_UI, Graphics_View
 from structure_ui_camera import Structure_Ui_Camera
 from structure_camera import Camera_Object, CAMERA_FLAGS
 import sys
 import cv2
+
 # from qt_tools import numpy_To_QT_Type_Converter
 
 class Ui_Camera_API_Main(Structure_UI):
@@ -27,40 +28,30 @@ class Ui_Camera_API_Developer(Structure_Ui_Camera):
         super(Ui_Camera_API_Developer, self).__init__(*args, **kwargs)
 
         self.logger_level = logger_level
+        self.q_timer = self._qtimer_Create_And_Run(
+            self,
+            connection=self.qtimer_function
+            ,
+            delay=10,
+            is_needed_start=True,
+            is_single_shot=False
+        )
 
-        self.init()
-    
-    def init(self):
-        self.configure_Other_Settings()  
-   
-    def configure_Other_Settings(self):
-        
-        self.init_qt_graphicsView_Scene(
-            self.frame_1,
-        )
-        self.init_qt_graphicsView_Scene(
-            self.frame_2,
-        )
-        self.init_qt_graphicsView_Scene(
-            self.frame_3,
-        )
-        self.init_qt_graphicsView_Scene(
-            self.frame_4,
-        )
+    def qtimer_function(self):
+        if self.camera_Instance is not None:
+            self.frame_1.set_Background_Image(self.camera_Instance.stream_Returner(auto_pop=True, pass_broken=True))
 
     def configure_Button_Connections(self):
-        self.connect_camera_button.clicked.connect(
-            
+        self.connect_camera_button.clicked.connect(            
             lambda: [
-            print("test"),  
             self.connect_to_Camera(
                 CAMERA_FLAGS.CV2,
                 buffer_size=1000,
                 exposure_time=40000,
                 auto_configure = False
-            )
+            ),
+            self.camera_Instance.api_CV2_Camera_Create_Instance(0, extra_params = [])
             ]
-            
         )
         self.remove_camera_button.clicked.connect(
             self.camera_Remove
@@ -68,7 +59,6 @@ class Ui_Camera_API_Developer(Structure_Ui_Camera):
 
     def closeEvent(self, *args, **kwargs):
         super(Ui_Camera_API_Developer, self).closeEvent(*args, **kwargs)
-
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)

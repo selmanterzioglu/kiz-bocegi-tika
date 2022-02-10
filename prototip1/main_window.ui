@@ -72,7 +72,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QGraphicsView" name="frame_1">
+        <widget class="Graphics_View" name="frame_1">
          <property name="sceneRect">
           <rectf>
            <x>0.000000000000000</x>
@@ -233,6 +233,13 @@
    <addaction name="menuFile"/>
   </widget>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>Graphics_View</class>
+   <extends>QGraphicsView</extends>
+   <header location="global">main_window_constructor</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
  <slots>
