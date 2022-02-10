@@ -19,21 +19,6 @@ class Ui_Camera_API_Main(Structure_UI):
         super(Ui_Camera_API_Main, self).__init__(*args, **kwargs)
 
         self.logger_level = logger_level
-        self.init()
-    
-
-    def init(self):
-        self.configure_Other_Settings()
-    
-    # def button_Connections(self):
-    #     # clicked_button = self.sender()
-    #     # if clicked_button.objectName() == "connect_camera_button":
-    #     #     self.test()
-    #     self.test()
-    
-    # def test(self):
-    #     print("test")
-        
 
 class Ui_Camera_API_Developer(Structure_Ui_Camera):
     logger_level = logging.INFO
@@ -65,16 +50,22 @@ class Ui_Camera_API_Developer(Structure_Ui_Camera):
 
     def configure_Button_Connections(self):
         self.connect_camera_button.clicked.connect(
-            # lambda: self.connect_to_Camera(
-            #     CAMERA_FLAGS.CV2,
-            #     self.spinBox_Buffer_Size.value(),
-            #     self.exposure_Time
-            # )
-            self.test
+            
+            lambda: [
+            print("test"),  
+            self.connect_to_Camera(
+                CAMERA_FLAGS.CV2,
+                buffer_size=1000,
+                exposure_time=40000,
+                auto_configure = False
+            )
+            ]
+            
         )
-    def test(self):
-        print("test")
-    
+        self.remove_camera_button.clicked.connect(
+            self.camera_Remove
+        )
+
     def closeEvent(self, *args, **kwargs):
         super(Ui_Camera_API_Developer, self).closeEvent(*args, **kwargs)
 
