@@ -19,7 +19,7 @@ cam =  Camera_Object(
             # logger_level=self.logger_level
         )
 
-cam.api_CV2_Camera_Create_Instance(0, extra_params = [])
+cam.api_CV2_Camera_Create_Instance(4, extra_params = [])
 
 cv2.namedWindow("test")
 
@@ -46,8 +46,6 @@ while True:
         img_counter += 1
 
 
-
-cam.release()
 
 cv2.destroyAllWindows()
 

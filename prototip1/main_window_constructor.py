@@ -28,19 +28,22 @@ class Ui_Camera_API_Developer(Structure_Ui_Camera):
         super(Ui_Camera_API_Developer, self).__init__(*args, **kwargs)
 
         self.logger_level = logger_level
-        self.q_timer = self._qtimer_Create_And_Run(
+        self.camera_Instance = None
+
+
+        self.q_timer_1 = self._qtimer_Create_And_Run(
             self,
-            connection=self.qtimer_function
-            ,
+            connection=self.qtimer_function_1,
             delay=10,
             is_needed_start=True,
             is_single_shot=False
         )
 
-    def qtimer_function(self):
+    def qtimer_function_1(self):
         if self.camera_Instance is not None:
             self.frame_1.set_Background_Image(self.camera_Instance.stream_Returner(auto_pop=True, pass_broken=True))
-
+    
+    
     def configure_Button_Connections(self):
         self.connect_camera_button.clicked.connect(            
             lambda: [
@@ -50,7 +53,7 @@ class Ui_Camera_API_Developer(Structure_Ui_Camera):
                 exposure_time=40000,
                 auto_configure = False
             ),
-            self.camera_Instance.api_CV2_Camera_Create_Instance(0, extra_params = [])
+            self.camera_Instance.api_CV2_Camera_Create_Instance(4, extra_params = [])
             ]
         )
         self.remove_camera_button.clicked.connect(
