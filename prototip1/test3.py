@@ -66,36 +66,100 @@ import cv2
 #     c = cv2.VideoCapture(camera)
 
 
-import cv2 as cv
-import PySpin
+# import cv2 as cv
+# import PySpin
 
-print (cv.__version__)
+# print (cv.__version__)
 
-# provided by Patrick Artner as solution to be working for other cameras than
-#                                                  those of Point Grey (FLIR).
+# # provided by Patrick Artner as solution to be working for other cameras than
+# #                                                  those of Point Grey (FLIR).
 
+# def testDevice(source):
+#    cap = cv.VideoCapture(source) 
+#    if cap is None or not cap.isOpened():
+#        print('Warning: unable to open video source: ', source)
+
+# # ... PySpin / Spinnaker (wrapper/SDK libary) ...
+
+# system   = PySpin.System.GetInstance()
+# cam_list = system.GetCameras()
+
+# cam = ''
+# cam_num = 0
+
+# for ID, cam in enumerate(cam_list):
+#     # Retrieve TL device nodemap
+#     if ID == cam_num:
+#         print ('Got cam')
+#         cam = cam
+
+#         cam.Init()
+
+#         # ... CV2 again ...
+
+#         for i in range(10):
+#             testDevice(i) # no printout
+
+
+
+# import numpy as np
+# import cv2 as cv
+# cap = cv.VideoCapture(4)
+
+# if not cap.isOpened():
+#     print("Cannot open camera")
+#     exit()
+# while True:
+#     # Capture frame-by-frame
+#     ret, frame = cap.read()
+#     # if frame is read correctly ret is True
+#     if not ret:
+#         print("Can't receive frame (stream end?). Exiting ...")
+#         break
+#     # Our operations on the frame come here
+#     # gray = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
+#     # Display the resulting frame
+#     cv.imshow('frame', frame)
+#     print(frame.shape)
+#     if cv.waitKey(1) == ord('q'):
+#         break
+# # When everything done, release the capture
+# cap.release()
+# cv.destroyAllWindows()
+
+
+
+# source = 10
+# arr = []
+# while source >0:
+#     import pdb
+#     pdb.set_trace()
+#     cap, frame= cv2.VideoCapture(source)
+#     if cap is None or not cap.isOpened():
+#         print('Warning: unable to open video source: ', source)
+#     else: 
+#         arr.append(source)
+#     source -= 1
+
+# temp_text = ""
+# for i in arr:
+#     temp_text += "," + i
+
+# print(temp_text)
+
+
+arr = []
 def testDevice(source):
-   cap = cv.VideoCapture(source) 
-   if cap is None or not cap.isOpened():
-       print('Warning: unable to open video source: ', source)
+    cap = cv2.VideoCapture(source) 
+    if cap is None or not cap.isOpened():
+        print('Warning: unable to open video source: ', source)
+        
+    else: 
+        arr.append(source)
 
-# ... PySpin / Spinnaker (wrapper/SDK libary) ...
 
-system   = PySpin.System.GetInstance()
-cam_list = system.GetCameras()
+for i in range(0,10):
+    testDevice(i) # no printout
 
-cam = ''
-cam_num = 0
-
-for ID, cam in enumerate(cam_list):
-    # Retrieve TL device nodemap
-    if ID == cam_num:
-        print ('Got cam')
-        cam = cam
-
-        cam.Init()
-
-        # ... CV2 again ...
-
-        for i in range(10):
-            testDevice(i) # no printout
+for i in arr:
+    print(i)

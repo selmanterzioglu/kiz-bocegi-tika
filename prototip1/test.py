@@ -19,7 +19,7 @@ cam =  Camera_Object(
             # logger_level=self.logger_level
         )
 
-cam.api_CV2_Camera_Create_Instance(4, extra_params = [])
+cam.api_CV2_Camera_Create_Instance(2, extra_params = [])
 
 cv2.namedWindow("test")
 
@@ -32,6 +32,7 @@ while True:
         print("failed to grab frame")
         break
     cv2.imshow("test", frame)
+    print(frame.shape)
 
     k = cv2.waitKey(1)
     if k%256 == 27:
