@@ -14,207 +14,198 @@
    <string>Kız Böcegi TİKA Kontrol Yazilimi</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="QPushButton" name="connect_camera_button">
-    <property name="geometry">
-     <rect>
-      <x>860</x>
-      <y>210</y>
-      <width>171</width>
-      <height>81</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Connect Camera</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label">
-    <property name="geometry">
-     <rect>
-      <x>880</x>
-      <y>130</y>
-      <width>85</width>
-      <height>22</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>TextLabel</string>
-    </property>
-   </widget>
-   <widget class="QWidget" name="layoutWidget">
-    <property name="geometry">
-     <rect>
-      <x>40</x>
-      <y>70</y>
-      <width>801</width>
-      <height>601</height>
-     </rect>
-    </property>
-    <layout class="QGridLayout" name="gridLayout">
-     <property name="leftMargin">
-      <number>0</number>
-     </property>
-     <property name="spacing">
-      <number>30</number>
-     </property>
-     <item row="0" column="0">
-      <layout class="QVBoxLayout" name="verticalLayout">
-       <item>
-        <widget class="QLabel" name="label_cam_1">
-         <property name="layoutDirection">
-          <enum>Qt::LeftToRight</enum>
-         </property>
-         <property name="text">
-          <string>Camera 1</string>
-         </property>
-         <property name="alignment">
-          <set>Qt::AlignCenter</set>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="Graphics_View" name="frame_1">
-         <property name="sceneRect">
-          <rectf>
-           <x>0.000000000000000</x>
-           <y>0.000000000000000</y>
-           <width>0.000000000000000</width>
-           <height>0.000000000000000</height>
-          </rectf>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLabel" name="cam_1_status_label">
-         <property name="text">
-          <string>Cam 1 Status:</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </item>
-     <item row="0" column="1">
-      <layout class="QVBoxLayout" name="verticalLayout_2">
-       <item>
-        <widget class="QLabel" name="label_cam_2">
-         <property name="layoutDirection">
-          <enum>Qt::LeftToRight</enum>
-         </property>
-         <property name="text">
-          <string>Camera 2</string>
-         </property>
-         <property name="alignment">
-          <set>Qt::AlignCenter</set>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="Graphics_View" name="frame_2">
-         <property name="sceneRect">
-          <rectf>
-           <x>0.000000000000000</x>
-           <y>0.000000000000000</y>
-           <width>0.000000000000000</width>
-           <height>0.000000000000000</height>
-          </rectf>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLabel" name="cam_2_status_label">
-         <property name="text">
-          <string>Cam 2 Status:</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </item>
-     <item row="1" column="0">
-      <layout class="QVBoxLayout" name="verticalLayout_3">
-       <item>
-        <widget class="QLabel" name="label_cam_3">
-         <property name="layoutDirection">
-          <enum>Qt::LeftToRight</enum>
-         </property>
-         <property name="text">
-          <string>Camera 3</string>
-         </property>
-         <property name="alignment">
-          <set>Qt::AlignCenter</set>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="Graphics_View" name="frame_3">
-         <property name="sceneRect">
-          <rectf>
-           <x>0.000000000000000</x>
-           <y>0.000000000000000</y>
-           <width>0.000000000000000</width>
-           <height>0.000000000000000</height>
-          </rectf>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLabel" name="cam_3_status_label">
-         <property name="text">
-          <string>Cam 3 Status:</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </item>
-     <item row="1" column="1">
-      <layout class="QVBoxLayout" name="verticalLayout_4">
-       <item>
-        <widget class="QLabel" name="label_cam_4">
-         <property name="layoutDirection">
-          <enum>Qt::LeftToRight</enum>
-         </property>
-         <property name="text">
-          <string>Camera 4</string>
-         </property>
-         <property name="alignment">
-          <set>Qt::AlignCenter</set>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="Graphics_View" name="frame_4">
-         <property name="sceneRect">
-          <rectf>
-           <x>0.000000000000000</x>
-           <y>0.000000000000000</y>
-           <width>0.000000000000000</width>
-           <height>0.000000000000000</height>
-          </rectf>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLabel" name="cam_4_status_label">
-         <property name="text">
-          <string>Cam 4 Status:</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </item>
-    </layout>
-   </widget>
-   <widget class="QPushButton" name="remove_camera_button">
-    <property name="geometry">
-     <rect>
-      <x>860</x>
-      <y>310</y>
-      <width>171</width>
-      <height>81</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Remove Camera</string>
-    </property>
-   </widget>
+   <layout class="QGridLayout" name="gridLayout_2">
+    <item row="1" column="1">
+     <widget class="QPushButton" name="remove_camera_button">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="text">
+       <string>Remove Camera</string>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="1">
+     <widget class="QSpinBox" name="spinBox_Camera_Selector"/>
+    </item>
+    <item row="3" column="1">
+     <widget class="QLabel" name="label">
+      <property name="text">
+       <string>TextLabel</string>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="1">
+     <widget class="QPushButton" name="connect_camera_button">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="text">
+       <string>Connect Camera</string>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="0" rowspan="7">
+     <layout class="QGridLayout" name="gridLayout">
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="spacing">
+       <number>30</number>
+      </property>
+      <item row="0" column="0">
+       <layout class="QVBoxLayout" name="verticalLayout">
+        <item>
+         <widget class="QLabel" name="label_cam_1">
+          <property name="layoutDirection">
+           <enum>Qt::LeftToRight</enum>
+          </property>
+          <property name="text">
+           <string>Camera 1</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="Graphics_View" name="frame_1">
+          <property name="sceneRect">
+           <rectf>
+            <x>0.000000000000000</x>
+            <y>0.000000000000000</y>
+            <width>0.000000000000000</width>
+            <height>0.000000000000000</height>
+           </rectf>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="cam_1_status_label">
+          <property name="text">
+           <string>Cam 1 Status:</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item row="0" column="1">
+       <layout class="QVBoxLayout" name="verticalLayout_2">
+        <item>
+         <widget class="QLabel" name="label_cam_2">
+          <property name="layoutDirection">
+           <enum>Qt::LeftToRight</enum>
+          </property>
+          <property name="text">
+           <string>Camera 2</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="Graphics_View" name="frame_2">
+          <property name="sceneRect">
+           <rectf>
+            <x>0.000000000000000</x>
+            <y>0.000000000000000</y>
+            <width>0.000000000000000</width>
+            <height>0.000000000000000</height>
+           </rectf>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="cam_2_status_label">
+          <property name="text">
+           <string>Cam 2 Status:</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item row="1" column="0">
+       <layout class="QVBoxLayout" name="verticalLayout_3">
+        <item>
+         <widget class="QLabel" name="label_cam_3">
+          <property name="layoutDirection">
+           <enum>Qt::LeftToRight</enum>
+          </property>
+          <property name="text">
+           <string>Camera 3</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="Graphics_View" name="frame_3">
+          <property name="sceneRect">
+           <rectf>
+            <x>0.000000000000000</x>
+            <y>0.000000000000000</y>
+            <width>0.000000000000000</width>
+            <height>0.000000000000000</height>
+           </rectf>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="cam_3_status_label">
+          <property name="text">
+           <string>Cam 3 Status:</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item row="1" column="1">
+       <layout class="QVBoxLayout" name="verticalLayout_4">
+        <item>
+         <widget class="QLabel" name="label_cam_4">
+          <property name="layoutDirection">
+           <enum>Qt::LeftToRight</enum>
+          </property>
+          <property name="text">
+           <string>Camera 4</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="Graphics_View" name="frame_4">
+          <property name="sceneRect">
+           <rectf>
+            <x>0.000000000000000</x>
+            <y>0.000000000000000</y>
+            <width>0.000000000000000</width>
+            <height>0.000000000000000</height>
+           </rectf>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="cam_4_status_label">
+          <property name="text">
+           <string>Cam 4 Status:</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </item>
+   </layout>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
@@ -222,7 +213,7 @@
      <x>0</x>
      <y>0</y>
      <width>1155</width>
-     <height>22</height>
+     <height>26</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
