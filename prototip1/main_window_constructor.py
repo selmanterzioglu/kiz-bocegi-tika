@@ -7,6 +7,7 @@ from PyQt5.QtGui import QImage, QPixmap
 from structure_ui import Structure_UI, Graphics_View
 from structure_ui_camera import Structure_Ui_Camera
 from structure_camera import Camera_Object, CAMERA_FLAGS
+from structure_system import System_Object
 import sys
 import cv2
 
@@ -29,7 +30,10 @@ class Ui_Camera_API_Developer(Structure_Ui_Camera):
 
         self.logger_level = logger_level
         self.camera_Instance = None
-        
+        system_o = System_Object()
+        print(system_o.thread_print_info())
+        # system_o.thread_print_info()
+
         self.cam_2 = Camera_Object(
             camera_flag=CAMERA_FLAGS.CV2,
             auto_configure=False,
@@ -52,13 +56,13 @@ class Ui_Camera_API_Developer(Structure_Ui_Camera):
             is_single_shot=False
         )
 
-        """self.q_timer_2 = self._qtimer_Create_And_Run(
+        self.q_timer_2 = self._qtimer_Create_And_Run(
             self,
             connection=self.qtimer_function_2,
             delay=10,
             is_needed_start=True,
             is_single_shot=False
-        )"""
+        )
 
         self.init()
     
@@ -89,10 +93,11 @@ class Ui_Camera_API_Developer(Structure_Ui_Camera):
                     auto_configure = False
                 ),
                 self.camera_Instance.api_CV2_Camera_Create_Instance(
-                    self.spinBox_Camera_Selector.value(), 
+                    # self.spinBox_Camera_Selector.value(), 
+                    6,
                     extra_params=[]
                 ),
-                """
+                
                 self.cam_2.api_CV2_Camera_Create_Instance(4, extra_params = []),
                 
                 self.cam_2.stream_Start_Thread(
@@ -101,7 +106,9 @@ class Ui_Camera_API_Developer(Structure_Ui_Camera):
                         trigger_pause=self.is_Stream_Active,
                         trigger_quit=self.is_Quit_App
                 ),
-                """
+                self.cam_1_status_label.setText(self.cam_1_status_label.text() + " ENABLED"),
+                self.cam_2_status_label.setText(self.cam_2_status_label.text() + " ENABLED"),
+                
             ]
         )
         self.remove_camera_button.clicked.connect(

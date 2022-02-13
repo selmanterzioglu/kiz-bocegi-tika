@@ -1,3 +1,4 @@
+from cgi import print_directory
 import cv2 
 
 # def returnCameraIndexes():
@@ -100,32 +101,51 @@ import cv2
 #         for i in range(10):
 #             testDevice(i) # no printout
 
+import numpy as np
+import cv2 as cv
+
+cap = cv.VideoCapture(6)
+
+# cap.set(3,1920)
+# cap.set(4,1080)
+# print(cap.get(cv2.CAP_PROP_FPS))
+# print(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+# print(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+
+codec = 0x47504A4D # MJPG
+
+cap.set(cv2.CAP_PROP_FPS, 30.0)
+
+cap.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter.fourcc('M','J','P','G'))
+
+cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
+
+cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
+
+print(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+print(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
 
 
-# import numpy as np
-# import cv2 as cv
-# cap = cv.VideoCapture(4)
-
-# if not cap.isOpened():
-#     print("Cannot open camera")
-#     exit()
-# while True:
-#     # Capture frame-by-frame
-#     ret, frame = cap.read()
-#     # if frame is read correctly ret is True
-#     if not ret:
-#         print("Can't receive frame (stream end?). Exiting ...")
-#         break
-#     # Our operations on the frame come here
-#     # gray = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
-#     # Display the resulting frame
-#     cv.imshow('frame', frame)
-#     print(frame.shape)
-#     if cv.waitKey(1) == ord('q'):
-#         break
-# # When everything done, release the capture
-# cap.release()
-# cv.destroyAllWindows()
+if not cap.isOpened():
+    print("Cannot open camera")
+    exit()
+while True:
+    # Capture frame-by-frame
+    ret, frame = cap.read()
+    # if frame is read correctly ret is True
+    if not ret:
+        print("Can't receive frame (stream end?). Exiting ...")
+        break
+    # Our operations on the frame come here
+    # gray = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
+    # Display the resulting frame
+    cv.imshow('frame', frame)
+    # print(frame.shape)
+    if cv.waitKey(1) == ord('q'):
+        break
+# When everything done, release the capture
+cap.release()
+cv.destroyAllWindows()
 
 
 
@@ -148,18 +168,18 @@ import cv2
 # print(temp_text)
 
 
-arr = []
-def testDevice(source):
-    cap = cv2.VideoCapture(source) 
-    if cap is None or not cap.isOpened():
-        print('Warning: unable to open video source: ', source)
+# arr = []
+# def testDevice(source):
+#     cap = cv2.VideoCapture(source) 
+#     if cap is None or not cap.isOpened():
+#         print('Warning: unable to open video source: ', source)
         
-    else: 
-        arr.append(source)
+#     else: 
+#         arr.append(source)
 
 
-for i in range(0,10):
-    testDevice(i) # no printout
+# for i in range(0,10):
+#     testDevice(i) # no printout
 
-for i in arr:
-    print(i)
+# for i in arr:
+#     print(i)
