@@ -10,6 +10,8 @@ from structure_camera import Camera_Object, CAMERA_FLAGS
 from structure_system import System_Object
 import sys
 import cv2
+import qt_tools
+
 
 # from qt_tools import numpy_To_QT_Type_Converter
 
@@ -33,9 +35,9 @@ class Ui_Camera_API_Developer(Structure_Ui_Camera):
         system_o = System_Object()
         print(system_o.thread_print_info())
         # system_o.thread_print_info()
-
-        self.cam_2 = Camera_Object(
+        self.cam_1 = Camera_Object(
             camera_flag=CAMERA_FLAGS.CV2,
+            logger_level=logging.INFO,
             auto_configure=False,
             trigger_quit=None,
             trigger_pause=None,
@@ -46,9 +48,23 @@ class Ui_Camera_API_Developer(Structure_Ui_Camera):
             max_buffer_limit=20
             # logger_level=self.logger_level
         )
-
+        self.cam_2 = Camera_Object(
+            camera_flag=CAMERA_FLAGS.CV2,
+            logger_level=logging.INFO,
+            auto_configure=False,
+            trigger_quit=None,
+            trigger_pause=None,
+            lock_until_done=False,
+            acquisition_framerate=30,
+            # exposure_time=exposure_time,
+            # max_buffer_limit=buffer_size,
+            max_buffer_limit=20
+            # logger_level=self.logger_level
+        )
         
-        self.q_timer_1 = self._qtimer_Create_And_Run(
+
+
+        self.q_timer_1 = qt_tools.qtimer_Create_And_Run(
             self,
             connection=self.qtimer_function_1,
             delay=10,
@@ -56,7 +72,7 @@ class Ui_Camera_API_Developer(Structure_Ui_Camera):
             is_single_shot=False
         )
 
-        self.q_timer_2 = self._qtimer_Create_And_Run(
+        self.q_timer_2 = qt_tools.qtimer_Create_And_Run(
             self,
             connection=self.qtimer_function_2,
             delay=10,
@@ -75,8 +91,8 @@ class Ui_Camera_API_Developer(Structure_Ui_Camera):
         pass
 
     def qtimer_function_1(self):
-        if self.camera_Instance is not None:
-            self.frame_1.set_Background_Image(self.camera_Instance.stream_Returner(auto_pop=True, pass_broken=True))
+        if self.cam_1 is not None:
+            self.frame_1.set_Background_Image(self.cam_1.stream_Returner(auto_pop=True, pass_broken=True))
     
     def qtimer_function_2(self):
         if self.cam_2 is not None:
@@ -86,33 +102,48 @@ class Ui_Camera_API_Developer(Structure_Ui_Camera):
     def configure_Button_Connections(self):
         self.connect_camera_button.clicked.connect(            
             lambda: [
-                self.connect_to_Camera(
-                    CAMERA_FLAGS.CV2,
-                    buffer_size=1000,
-                    exposure_time=40000,
-                    auto_configure = False
-                ),
-                self.camera_Instance.api_CV2_Camera_Create_Instance(
-                    # self.spinBox_Camera_Selector.value(), 
-                    6,
-                    extra_params=[]
-                ),
+                # self.connect_to_Camera(
+                #     CAMERA_FLAGS.CV2,
+                #     buffer_size=1000,
+                #     exposure_time=40000,
+                #     auto_configure = False
+                # ),
                 
-                self.cam_2.api_CV2_Camera_Create_Instance(4, extra_params = []),
+                # self.camera_Instance.api_CV2_Camera_Create_Instance(
+                #     # self.spinBox_Camera_Selector.value(), 
+                #     2,
+                #     extra_params=[]
+                # ),
+
+                self.cam_1.api_CV2_Camera_Create_Instance(1, extra_params = []),
+                self.cam_2.api_CV2_Camera_Create_Instance(2, extra_params = []),
                 
+                self.cam_1.stream_Start_Thread(
+                    number_of_snapshot=1000,
+                    delay = 0.001,
+                    trigger_pause=self.is_Stream_Active,
+                    trigger_quit=self.is_Quit_App
+                ),
                 self.cam_2.stream_Start_Thread(
                         number_of_snapshot=1000,
                         delay=0.001,
                         trigger_pause=self.is_Stream_Active,
                         trigger_quit=self.is_Quit_App
                 ),
+                
                 self.cam_1_status_label.setText(self.cam_1_status_label.text() + " ENABLED"),
                 self.cam_2_status_label.setText(self.cam_2_status_label.text() + " ENABLED"),
+                self.stream_Switch(True)
                 
             ]
         )
         self.remove_camera_button.clicked.connect(
-            self.camera_Remove
+            lambda:[
+                self.camera_Remove,
+                self.cam_1_status_label.setText("Cam 1 Status:"),
+                self.cam_2_status_label.setText("Cam 2 Status:")
+
+            ]
         )
 
     def closeEvent(self, *args, **kwargs):
