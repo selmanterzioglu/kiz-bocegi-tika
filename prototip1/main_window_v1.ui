@@ -1,0 +1,246 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>800</width>
+    <height>600</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QGridLayout" name="gridLayout">
+    <item row="0" column="0">
+     <widget class="QGroupBox" name="groupBox">
+      <property name="title">
+       <string>Camera 1</string>
+      </property>
+      <layout class="QGridLayout" name="gridLayout_2">
+       <item row="0" column="0">
+        <widget class="Graphics_View" name="frame_1">
+         <property name="verticalScrollBarPolicy">
+          <enum>Qt::ScrollBarAlwaysOff</enum>
+         </property>
+         <property name="horizontalScrollBarPolicy">
+          <enum>Qt::ScrollBarAlwaysOff</enum>
+         </property>
+         <property name="sceneRect">
+          <rectf>
+           <x>0.000000000000000</x>
+           <y>0.000000000000000</y>
+           <width>0.000000000000000</width>
+           <height>0.000000000000000</height>
+          </rectf>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="QLabel" name="cam_1_status_label">
+         <property name="text">
+          <string>Cam 1 Status:</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </item>
+    <item row="0" column="1">
+     <widget class="QGroupBox" name="groupBox_2">
+      <property name="title">
+       <string>Camera 2</string>
+      </property>
+      <layout class="QGridLayout" name="gridLayout_3">
+       <item row="0" column="0">
+        <widget class="Graphics_View" name="frame_2">
+         <property name="verticalScrollBarPolicy">
+          <enum>Qt::ScrollBarAlwaysOff</enum>
+         </property>
+         <property name="horizontalScrollBarPolicy">
+          <enum>Qt::ScrollBarAlwaysOff</enum>
+         </property>
+         <property name="sceneRect">
+          <rectf>
+           <x>0.000000000000000</x>
+           <y>0.000000000000000</y>
+           <width>0.000000000000000</width>
+           <height>0.000000000000000</height>
+          </rectf>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="QLabel" name="cam_2_status_label">
+         <property name="text">
+          <string>Cam 2 Status:</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </item>
+    <item row="0" column="2" rowspan="2">
+     <widget class="QGroupBox" name="groupBox_5">
+      <property name="title">
+       <string>System</string>
+      </property>
+      <layout class="QGridLayout" name="gridLayout_6">
+       <item row="0" column="0">
+        <widget class="QPushButton" name="connect_camera_button">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="text">
+          <string>Connect Camera</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="0">
+        <widget class="QSpinBox" name="spinBox_Camera_Selector"/>
+       </item>
+       <item row="1" column="0">
+        <widget class="QPushButton" name="remove_camera_button">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="text">
+          <string>Remove Camera</string>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="0">
+        <widget class="QLabel" name="label_memory">
+         <property name="text">
+          <string>TextLabel</string>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="0">
+        <widget class="Graphics_View" name="frame_0">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="verticalScrollBarPolicy">
+          <enum>Qt::ScrollBarAlwaysOff</enum>
+         </property>
+         <property name="horizontalScrollBarPolicy">
+          <enum>Qt::ScrollBarAlwaysOff</enum>
+         </property>
+         <property name="sceneRect">
+          <rectf>
+           <x>0.000000000000000</x>
+           <y>0.000000000000000</y>
+           <width>0.000000000000000</width>
+           <height>0.000000000000000</height>
+          </rectf>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </item>
+    <item row="1" column="0">
+     <widget class="QGroupBox" name="groupBox_3">
+      <property name="title">
+       <string>Camera 3</string>
+      </property>
+      <layout class="QGridLayout" name="gridLayout_4">
+       <item row="0" column="0">
+        <widget class="Graphics_View" name="frame_3">
+         <property name="verticalScrollBarPolicy">
+          <enum>Qt::ScrollBarAlwaysOff</enum>
+         </property>
+         <property name="horizontalScrollBarPolicy">
+          <enum>Qt::ScrollBarAlwaysOff</enum>
+         </property>
+         <property name="sceneRect">
+          <rectf>
+           <x>0.000000000000000</x>
+           <y>0.000000000000000</y>
+           <width>0.000000000000000</width>
+           <height>0.000000000000000</height>
+          </rectf>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="QLabel" name="cam_3_status_label">
+         <property name="text">
+          <string>Cam 3 Status:</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </item>
+    <item row="1" column="1">
+     <widget class="QGroupBox" name="groupBox_4">
+      <property name="title">
+       <string>Camera 4</string>
+      </property>
+      <layout class="QGridLayout" name="gridLayout_5">
+       <item row="0" column="0">
+        <widget class="Graphics_View" name="frame_4">
+         <property name="verticalScrollBarPolicy">
+          <enum>Qt::ScrollBarAlwaysOff</enum>
+         </property>
+         <property name="horizontalScrollBarPolicy">
+          <enum>Qt::ScrollBarAlwaysOff</enum>
+         </property>
+         <property name="sceneRect">
+          <rectf>
+           <x>0.000000000000000</x>
+           <y>0.000000000000000</y>
+           <width>0.000000000000000</width>
+           <height>0.000000000000000</height>
+          </rectf>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="QLabel" name="cam_4_status_label">
+         <property name="text">
+          <string>Cam 4 Status:</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>800</width>
+     <height>26</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>Graphics_View</class>
+   <extends>QGraphicsView</extends>
+   <header location="global">main_window_constructor</header>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>

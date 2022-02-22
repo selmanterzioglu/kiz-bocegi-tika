@@ -20,6 +20,15 @@ class kiz_UI(Structure_UI):
         self.system_o.thread_print_info()
         
         self.is_Camera_Stream_Active = False
+        
+        self.q_timers["camera_0_renderer"] = qt_tools.qtimer_Create_And_Run(
+            self,
+            connection=self.camera_0_renderer,
+            delay=10,
+            is_needed_start=True,
+            is_single_shot=False
+        )
+        
         self.q_timers["camera_1_renderer"] = qt_tools.qtimer_Create_And_Run(
             self,
             connection=self.camera_1_renderer,
@@ -51,6 +60,20 @@ class kiz_UI(Structure_UI):
                 max_buffer_limit=10
                 # logger_level=self.logger_level
             ) 
+        if not self.cameras.get("camera_0"):
+            self.cameras["camera_0"] = Camera_Object(
+                camera_flag=CAMERA_FLAGS.CV2,
+                logger_level=logging.INFO,
+                auto_configure=False,
+                trigger_quit=None,
+                trigger_pause=None,
+                lock_until_done=False,
+                acquisition_framerate=30,
+                # exposure_time=exposure_time,
+                # max_buffer_limit=buffer_size,
+                max_buffer_limit=10
+                # logger_level=self.logger_level
+            ) 
         if not self.cameras.get("camera_2"):
             self.cameras["camera_2"] = Camera_Object(
                 camera_flag=CAMERA_FLAGS.CV2,
@@ -66,6 +89,10 @@ class kiz_UI(Structure_UI):
                 # logger_level=self.logger_level
             )
 
+    def camera_0_renderer(self):
+        if self.cameras.get("camera_0"):
+            self.frame_0.set_Background_Image(self.cameras["camera_0"].stream_Returner(auto_pop=True, pass_broken=True))
+    
     def camera_1_renderer(self):
         if self.cameras.get("camera_1"):
             self.frame_1.set_Background_Image(self.cameras["camera_1"].stream_Returner(auto_pop=True, pass_broken=True))
@@ -78,20 +105,27 @@ class kiz_UI(Structure_UI):
         if self.is_Camera_Instance_Exist():
             self.stream_Switch(False)
 
-            self.cameras["camera_1"].quit()
-            self.cameras["camera_2"].quit()
-            
-            self.cameras.pop("camera_1")
-            self.cameras.pop("camera_2")
+            for camera in self.cameras.values():
+                camera.quit()
+
+            for key in self.cameras.keys():
+                self.cameras.pop(key)
     
     def configure_Button_Connections(self):
         self.connect_camera_button.clicked.connect(            
             lambda: [
                 self.camera_Initializes(),
 
+                self.cameras["camera_0"].api_CV2_Camera_Create_Instance(0, extra_params = []),
                 self.cameras["camera_1"].api_CV2_Camera_Create_Instance(1, extra_params = []),
                 self.cameras["camera_2"].api_CV2_Camera_Create_Instance(2, extra_params = []),
                 
+                self.cameras["camera_0"].stream_Start_Thread(
+                    number_of_snapshot=-1,
+                    delay=0.001,
+                    trigger_pause=self.is_Stream_Active,
+                    trigger_quit=self.is_Quit_App
+                ),
                 self.cameras["camera_1"].stream_Start_Thread(
                     number_of_snapshot=-1,
                     delay = 0.001,
