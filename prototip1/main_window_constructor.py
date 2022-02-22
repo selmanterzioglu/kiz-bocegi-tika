@@ -1,7 +1,6 @@
 import libs
 
 import logging
-from PyQt5.QtWidgets import *
 from structure_ui import Structure_UI, Graphics_View
 from structure_camera import Camera_Object, CAMERA_FLAGS
 from structure_system import System_Object
@@ -10,7 +9,6 @@ import qt_tools
 
 
 class kiz_UI(Structure_UI):
-
     def __init__(self, *args, onj = None, logger_level = logging.INFO, **kwargs):
         super(kiz_UI, self).__init__(*args, **kwargs)
 
