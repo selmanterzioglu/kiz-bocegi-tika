@@ -36,15 +36,6 @@ class kiz_UI(Structure_UI):
             is_single_shot=False
         )
 
-        self.init()
-    
-    def init(self):
-        self.configure_Other_Settings()
-
-    def configure_Other_Settings(self):
-        # self.label.setText(self.get_camera_available_port())
-        pass 
-       
     def camera_Initializes(self):
         if not self.cameras.get("camera_1"):
             self.cameras["camera_1"] = Camera_Object(
