@@ -22,7 +22,7 @@ class kiz_UI(Structure_UI):
         self.is_Camera_Stream_Active = False
         self.q_timers["camera_1_renderer"] = qt_tools.qtimer_Create_And_Run(
             self,
-            connection=self.qtimer_function_1,
+            connection=self.camera_1_renderer,
             delay=10,
             is_needed_start=True,
             is_single_shot=False
@@ -30,7 +30,7 @@ class kiz_UI(Structure_UI):
 
         self.q_timers["camera_2_renderer"] = qt_tools.qtimer_Create_And_Run(
             self,
-            connection=self.qtimer_function_2,
+            connection=self.camera_2_renderer,
             delay=10,
             is_needed_start=True,
             is_single_shot=False
@@ -66,11 +66,11 @@ class kiz_UI(Structure_UI):
                 # logger_level=self.logger_level
             )
 
-    def qtimer_function_1(self):
+    def camera_1_renderer(self):
         if self.cameras.get("camera_1"):
             self.frame_1.set_Background_Image(self.cameras["camera_1"].stream_Returner(auto_pop=True, pass_broken=True))
     
-    def qtimer_function_2(self):
+    def camera_2_renderer(self):
         if self.cameras.get("camera_2"):
             self.frame_2.set_Background_Image(self.cameras["camera_2"].stream_Returner(auto_pop=True, pass_broken=True))
     
@@ -83,7 +83,6 @@ class kiz_UI(Structure_UI):
             
             self.cameras.pop("camera_1")
             self.cameras.pop("camera_2")
-        #return self.is_Stream_Active()
     
     def configure_Button_Connections(self):
         self.connect_camera_button.clicked.connect(            
