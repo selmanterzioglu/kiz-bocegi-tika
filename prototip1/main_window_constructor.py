@@ -20,39 +20,26 @@ class kiz_UI(Structure_UI):
         self.max_camera_numbers = 4
         self.is_Camera_Stream_Active = False
         self.logger_level = logger_level
-
-        self.cam_1_status_label = None
-        self.cam_2_status_label = None
-        self.cam_3_status_label = None
-        self.cam_4_status_label = None
-
-
-        self.items_of_class = globals()
         self.connected_camera_list = list()
 
         self.system_o = System_Object()
         self.system_o.thread_print_info()
         
-        self.camera_qtimer_creater_runer()
-        for i in self.items_of_class:
-            print(i)
     def camera_qtimer_creater_runer(self):
         self.available_cameras = self.get_camera_available_port()
         available_cameras_counter = len(self.available_cameras)
-
         if available_cameras_counter == 0:
             print("your camera/s is not available")
         else:    
-            if available_cameras_counter == 1:
+            if available_cameras_counter >= 1:
                 self.q_timers["camera_1_renderer"] = qt_tools.qtimer_Create_And_Run(
                     self,
                     connection=self.camera_1_renderer,
                     delay=10,
                     is_needed_start=True,
                     is_single_shot=False
-                )
-                
-            if available_cameras_counter == 2:
+                )   
+            if available_cameras_counter >= 2:
                 self.q_timers["camera_2_renderer"] = qt_tools.qtimer_Create_And_Run(
                     self,
                     connection=self.camera_2_renderer,
@@ -60,7 +47,7 @@ class kiz_UI(Structure_UI):
                     is_needed_start=True,
                     is_single_shot=False
                 )
-            if available_cameras_counter == 3:
+            if available_cameras_counter >= 3:
                 self.q_timers["camera_3_renderer"] = qt_tools.qtimer_Create_And_Run(
                     self,
                     connection=self.camera_3_renderer,
@@ -68,7 +55,7 @@ class kiz_UI(Structure_UI):
                     is_needed_start=True,
                     is_single_shot=False
                 )
-            if available_cameras_counter == 4:
+            if available_cameras_counter >= 4:
                 self.q_timers["camera_4_renderer"] = qt_tools.qtimer_Create_And_Run(
                     self,
                     connection=self.camera_4_renderer,
@@ -163,22 +150,54 @@ class kiz_UI(Structure_UI):
     
     def autonomous_Camera_Instance(self):
         available_cameras_counter = len(self.available_cameras)
+        counter=0
         for i in range(1,available_cameras_counter+1):
-            counter=i-1
             cam_string = "camera_{}".format(i)
             self.cameras[cam_string].api_CV2_Camera_Create_Instance(self.available_cameras[counter], extra_params = []),
-    
-    def camera_status_clear(self):
-        for i in range(1,self.max_camera_numbers+1):
-            temp = "cam_{}_status_label".format(i)
-            self.items_of_class[temp].setText("")
+            counter +=1
+
+    def camera_status_clear(self, counter):
+        if counter >= 1:
+            self.cam_1_status_label.setText("")
+        if counter >= 2:
+            self.cam_2_status_label.setText("")
+        if counter >= 3:
+            self.cam_3_status_label.setText("")
+        if counter >= 4:
+            self.cam_4_status_label.setText("")
+
+    def camera_status_remove(self):
+        available_cameras_counter = len(self.available_cameras)
+        self.camera_status_clear(available_cameras_counter)
+
+        if available_cameras_counter >= 1:
+            self.cam_1_status_label.setText("Cam 1 Status:" + " camera is removed")
+        if available_cameras_counter >= 2:
+            self.cam_2_status_label.setText("Cam 2 Status:" + " camera is removed")
+        if available_cameras_counter >= 3:
+            self.cam_3_status_label.setText("Cam 3 Status:" + " camera is removed")
+        if available_cameras_counter >= 4:
+            self.cam_4_status_label.setText("Cam 4 Status:" + " camera is removed")
+
+    def camera_status_default(self):
+        self.camera_status_clear(self.max_camera_numbers)
+        self.cam_1_status_label.setText("Cam 1 Status:")
+        self.cam_2_status_label.setText("Cam 2 Status:")
+        self.cam_3_status_label.setText("Cam 3 Status:")
+        self.cam_4_status_label.setText("Cam 4 Status:")
 
     def camera_status_connected(self):
-        self.camera_status_clear()
         available_cameras_counter = len(self.available_cameras)
-        for i in range(1,available_cameras_counter+1):
-            temp = "cam_{}_status_label".format(i)
-            self.items_of_class[temp].setText("Cam {} Status:" + " ENABLED".format(i))
+        self.camera_status_clear(available_cameras_counter)
+
+        if available_cameras_counter >= 1:
+            self.cam_1_status_label.setText("Cam 1 Status:" + " ENABLED")
+        if available_cameras_counter >= 2:
+            self.cam_2_status_label.setText("Cam 2 Status:" + " ENABLED")
+        if available_cameras_counter >= 3:
+            self.cam_3_status_label.setText("Cam 3 Status:" + " ENABLED")
+        if available_cameras_counter >= 4:
+            self.cam_4_status_label.setText("Cam 4 Status:" + " ENABLED")
 
     def autonums_Camera_Thread_Starter(self):
         """This function start camera thread functions"""
@@ -193,21 +212,23 @@ class kiz_UI(Structure_UI):
                     trigger_quit=self.is_Quit_App
             )
 
+    
     def configure_Button_Connections(self):
         self.connect_camera_button.clicked.connect(            
             lambda: [
-                self.camera_status_clear(),
+                self.camera_qtimer_creater_runer(),
+                self.camera_status_clear(self.max_camera_numbers),
                 self.camera_Initializes(),
                 self.autonomous_Camera_Instance(),
                 self.autonums_Camera_Thread_Starter(),
-                self.stream_Switch(True)
+                self.stream_Switch(True),
+                self.camera_status_connected()
             ]
         )
         self.remove_camera_button.clicked.connect(
             lambda:[
                 self.camera_Remove,
-                self.cam_1_status_label.setText("Cam 1 Status: Camera is removed"),
-                self.cam_2_status_label.setText("Cam 2 Status: Camera is removed")
+                self.camera_status_remove()
             ]
         )
 
