@@ -1,7 +1,4 @@
-from itertools import count
-from matplotlib.style import available
 import libs
-
 import logging
 from structure_ui import Structure_UI, Graphics_View
 from structure_camera import Camera_Object, CAMERA_FLAGS
@@ -139,14 +136,14 @@ class kiz_UI(Structure_UI):
             self.frame_4.set_Background_Image(self.cameras["camera_4"].stream_Returner(auto_pop=True, pass_broken=True))
     
     def camera_Remove(self):
-        if self.is_Camera_Instance_Exist():
-            self.stream_Switch(False)
+        # if self.is_Camera_Instance_Exist():
+        self.stream_Switch(False)
 
-            for camera in self.cameras.values():
-                camera.quit()
+        for camera in self.cameras.values():
+            camera.quit()
 
-            for key in self.cameras.keys():
-                self.cameras.pop(key)
+        for key in self.cameras.keys():
+            self.cameras.pop(key)
     
     def autonomous_Camera_Instance(self):
         available_cameras_counter = len(self.available_cameras)
@@ -211,8 +208,9 @@ class kiz_UI(Structure_UI):
                     trigger_pause=self.is_Stream_Active,
                     trigger_quit=self.is_Quit_App
             )
+    def set_statusbar_string(self, message):
+        self.statusBar().showMessage(message)
 
-    
     def configure_Button_Connections(self):
         self.connect_camera_button.clicked.connect(            
             lambda: [
@@ -227,8 +225,10 @@ class kiz_UI(Structure_UI):
         )
         self.remove_camera_button.clicked.connect(
             lambda:[
-                self.camera_Remove,
-                self.camera_status_remove()
+                # self.camera_Remove(), # this button is beta version. it is not working
+                
+                self.camera_status_remove(),
+                self.set_statusbar_string("This button is not working.!")
             ]
         )
 
