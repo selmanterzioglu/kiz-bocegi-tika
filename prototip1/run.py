@@ -10,5 +10,4 @@ if __name__ == "__main__":
         UI_File_Path="main_window_v1.ui"
     )
 
-
-#  yenı satır eklendı
+# talha satırı eklendi
