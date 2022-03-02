@@ -1,5 +1,0 @@
-2022-02-05 23:17:52,962 - DEBUG - Debug mesaji
-2022-02-05 23:17:52,962 - INFO - info mesaji
-2022-02-05 23:17:52,962 - WARNING - warning mesaji
-2022-02-05 23:17:52,962 - ERROR - error mesaji
-2022-02-05 23:17:52,962 - CRITICAL - kritik hata mesaji
