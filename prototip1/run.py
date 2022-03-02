@@ -9,5 +9,3 @@ if __name__ == "__main__":
         Class_UI=kiz_UI,
         UI_File_Path="main_window_v1.ui"
     )
-
-# talha satırı eklendi
