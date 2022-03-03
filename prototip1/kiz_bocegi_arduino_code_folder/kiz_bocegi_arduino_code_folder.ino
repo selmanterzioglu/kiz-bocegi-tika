@@ -144,30 +144,36 @@ void motors_status(motors flag){
 }
 
 int get_distance_sensors_frontEnd(){
-  digitalWrite(g_shared.trigPinOn, LOW);         //İlk basta trig pinimizi low durumunda baslatiyoruz
-  delayMicroseconds(0.01);                   //5 mikrosaniye bekletiyoruz
-  digitalWrite(g_shared.trigPinOn, HIGH);        //Daha sonra pinimizi, ses dalgasi göndermesi icin calistiriyoruz
-  delayMicroseconds(0.02);                  //10 mikrosaniye bekletiyoruz
-  digitalWrite(g_shared.trigPinOn, LOW);         //Trig pinimizi pasif duruma getiriyoruz
-  g_shared.sureOn = pulseIn(g_shared.echoPinOn, HIGH);  //Gonderilen dalganin geri donmesindeki sureyi olcuyor
-  g_shared.uzaklikOn = g_shared.sureOn /29.1/2;         //Olctugu sureyi uzakliga ceviriyoruz
+  // This function is calculate distance from front_end distance sensors to obstacle.
+
+  digitalWrite(g_shared.trigPinOn, LOW);                // ilk basta trig pinimizi low durumunda baslatiyoruz
+  delayMicroseconds(0.01);                              // 5 mikrosaniye bekletiyoruz
+  digitalWrite(g_shared.trigPinOn, HIGH);               // Daha sonra pinimizi, ses dalgasi göndermesi icin calistiriyoruz
+  delayMicroseconds(0.02);                              // 10 mikrosaniye bekletiyoruz
+  digitalWrite(g_shared.trigPinOn, LOW);                // Trig pinimizi pasif duruma getiriyoruz
+  g_shared.sureOn = pulseIn(g_shared.echoPinOn, HIGH);  // Gonderilen dalganin geri donmesindeki sureyi olcuyor
+  g_shared.uzaklikOn = g_shared.sureOn /29.1/2;         // Olctugu sureyi uzakliga ceviriyoruz
 
   return  g_shared.uzaklikOn;
 }
 
 int get_distance_sensors_backEnd(){
-  digitalWrite(g_shared.trigPinArka, LOW);         //İlk basta trig pinimizi low durumunda baslatiyoruz
-  delayMicroseconds(0.01);                   //5 mikrosaniye bekletiyoruz
-  digitalWrite(g_shared.trigPinArka, HIGH);        //Daha sonra pinimizi, ses dalgasi göndermesi icin calistiriyoruz
-  delayMicroseconds(0.02);                  //10 mikrosaniye bekletiyoruz
-  digitalWrite(g_shared.trigPinArka, LOW);         //Trig pinimizi pasif duruma getiriyoruz
-  g_shared.sureArka = pulseIn(g_shared.echoPinArka, HIGH);  //Gonderilen dalganin geri donmesindeki sureyi olcuyor
-  g_shared.uzaklikArka = g_shared.sureArka /29.1/2;         //Olctugu sureyi uzakliga ceviriyoruz
+    // This function is calculate distance from front_end distance sensors to obstacle.
+
+  digitalWrite(g_shared.trigPinArka, LOW);                  // İlk basta trig pinimizi low durumunda baslatiyoruz
+  delayMicroseconds(0.01);                                  // 5 mikrosaniye bekletiyoruz
+  digitalWrite(g_shared.trigPinArka, HIGH);                 // Daha sonra pinimizi, ses dalgasi göndermesi icin calistiriyoruz
+  delayMicroseconds(0.02);                                  // 10 mikrosaniye bekletiyoruz
+  digitalWrite(g_shared.trigPinArka, LOW);                  // Trig pinimizi pasif duruma getiriyoruz
+  g_shared.sureArka = pulseIn(g_shared.echoPinArka, HIGH);  // Gonderilen dalganin geri donmesindeki sureyi olcuyor
+  g_shared.uzaklikArka = g_shared.sureArka /29.1/2;         // Olctugu sureyi uzakliga ceviriyoruz
   
   return g_shared.uzaklikArka;
 }
 
 void print_info(print_flags flag){
+  // This function print all info variables to serial monitor. 
+  // You must choose which variable write to serial monitor using print_flags .
 
   switch(flag){
     case PRINT_MOTORS:
@@ -186,7 +192,7 @@ void print_info(print_flags flag){
 
     case PRINT_DISTANCE_SENSORS_BACKEND:
       Serial.print("Uzaklik Arka "); 
-      Serial.print(g_shared.uzaklikArka);              //Olctugumuz uzakligi seri port ekranina yazdiriyoruz
+      Serial.print(g_shared.uzaklikArka);   //Olctugumuz uzakligi seri port ekranina yazdiriyoruz
       Serial.print(" cm *** \n");
       break;
       
@@ -196,6 +202,8 @@ void print_info(print_flags flag){
 }
 
 void print_info_all(){
+  //  if IS_PRINT is true, this function writes all variables to serial monitor.
+
     #if IS_PRINT
       print_info(PRINT_MOTORS);
       print_info(PRINT_RPI);
@@ -204,15 +212,17 @@ void print_info_all(){
 }
 
 void set_pin_distance(sensors flag){
+  // This function set new distance into distance sensors variables.
+  
   switch (flag)
   {
   case DISTANCE_SENSORS_FRONT:
-    if(g_shared.uzaklikOn > 100)                   //200 cm ve üzeri tum uzakliklari 200 cm olarak sabitliyoruz
+    if(g_shared.uzaklikOn > 100)    //200 cm ve üzeri tum uzakliklari 200 cm olarak sabitliyoruz
     g_shared.uzaklikOn = 100;
     break;
   
   case DISTANCE_SENSORS_BACKEND:
-    if(g_shared.uzaklikArka > 100)                   //200 cm ve üzeri tum uzakliklari 200 cm olarak sabitliyoruz
+    if(g_shared.uzaklikArka > 100)  //200 cm ve üzeri tum uzakliklari 200 cm olarak sabitliyoruz
     g_shared.uzaklikArka = 100;
     break;
   
@@ -230,6 +240,8 @@ void loop() {
 }
 
 void scenario(){
+  //  below lines are functions which calculate distance using distance_sensors and print info to serial monitor.
+
   get_distance_sensors_frontEnd();
   set_pin_distance(DISTANCE_SENSORS_FRONT);
 
@@ -247,8 +259,9 @@ void scenario(){
   else if(((g_shared.uzaklikArka > 0)&&(g_shared.uzaklikArka <= 5))&&((g_shared.uzaklikOn == 0)||(g_shared.uzaklikOn > 5))){
     motors_status(MOTORS_FORWARD);
   }
-  // deleted else line here. because it was an unnecessary.
+  // deleted 'else' code line here. because it was an unnecessary.
   
+
   if(g_shared.a1 > 0){
     motors_status(MOTORS_BACKWARD);
   }
