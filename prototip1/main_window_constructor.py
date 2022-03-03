@@ -61,9 +61,10 @@ class kiz_UI(Structure_UI):
                     is_single_shot=False
                 )
        
-    def camera_Initializes(self):
-        if not self.cameras.get("camera_1"):
-            self.cameras["camera_1"] = Camera_Object(
+    def camera_Initializes(self, camera_number):
+        camera_string = "camera_" + str(camera_number)
+        if not self.cameras.get(camera_string):
+            self.cameras[camera_string] = Camera_Object(
                 camera_flag=CAMERA_FLAGS.CV2,
                 logger_level=logging.INFO,
                 auto_configure=False,
@@ -76,49 +77,7 @@ class kiz_UI(Structure_UI):
                 max_buffer_limit=10
                 # logger_level=self.logger_level
             ) 
-        if not self.cameras.get("camera_2"):
-            self.cameras["camera_2"] = Camera_Object(
-                camera_flag=CAMERA_FLAGS.CV2,
-                logger_level=logging.INFO,
-                auto_configure=False,
-                trigger_quit=None,
-                trigger_pause=None,
-                lock_until_done=False,
-                acquisition_framerate=30,
-                # exposure_time=exposure_time,
-                # max_buffer_limit=buffer_size,
-                max_buffer_limit=10
-                # logger_level=self.logger_level
-            )
-        if not self.cameras.get("camera_3"):
-            self.cameras["camera_3"] = Camera_Object(
-                camera_flag=CAMERA_FLAGS.CV2,
-                logger_level=logging.INFO,
-                auto_configure=False,
-                trigger_quit=None,
-                trigger_pause=None,
-                lock_until_done=False,
-                acquisition_framerate=30,
-                # exposure_time=exposure_time,
-                # max_buffer_limit=buffer_size,
-                max_buffer_limit=10
-                # logger_level=self.logger_level
-            )
-        if not self.cameras.get("camera_4"):
-            self.cameras["camera_4"] = Camera_Object(
-                camera_flag=CAMERA_FLAGS.CV2,
-                logger_level=logging.INFO,
-                auto_configure=False,
-                trigger_quit=None,
-                trigger_pause=None,
-                lock_until_done=False,
-                acquisition_framerate=30,
-                # exposure_time=exposure_time,
-                # max_buffer_limit=buffer_size,
-                max_buffer_limit=10
-                # logger_level=self.logger_level
-            )
-    
+
     def camera_1_renderer(self):
         if self.cameras.get("camera_1"):
             self.frame_1.set_Background_Image(self.cameras["camera_1"].stream_Returner(auto_pop=True, pass_broken=True))
@@ -151,6 +110,7 @@ class kiz_UI(Structure_UI):
         for i in range(1,available_cameras_counter+1):
             cam_string = "camera_{}".format(i)
             self.cameras[cam_string].api_CV2_Camera_Create_Instance(self.available_cameras[counter], extra_params = []),
+            self.camera_Initializes(camera_number=i)
             counter +=1
 
     def camera_status_clear(self, counter):
@@ -196,7 +156,7 @@ class kiz_UI(Structure_UI):
         if available_cameras_counter >= 4:
             self.cam_4_status_label.setText("Cam 4 Status:" + " ENABLED")
 
-    def autonums_Camera_Thread_Starter(self):
+    def autonomous_Camera_Thread_Starter(self):
         """This function start camera thread functions"""
 
         available_cameras_counter = len(self.available_cameras)
@@ -208,17 +168,24 @@ class kiz_UI(Structure_UI):
                     trigger_pause=self.is_Stream_Active,
                     trigger_quit=self.is_Quit_App
             )
+            
     def set_statusbar_string(self, message):
         self.statusBar().showMessage(message)
+
+    def video_capture(self):
+        available_cameras_counter = len(self.available_cameras)
+
+        for i in range(1,available_cameras_counter+1):
+            cam_string = "camera_{}".format(i)
+            self.cameras[cam_string]
 
     def configure_Button_Connections(self):
         self.connect_camera_button.clicked.connect(            
             lambda: [
                 self.camera_qtimer_creater_runer(),
                 self.camera_status_clear(self.max_camera_numbers),
-                self.camera_Initializes(),
                 self.autonomous_Camera_Instance(),
-                self.autonums_Camera_Thread_Starter(),
+                self.autonomous_Camera_Thread_Starter(),
                 self.stream_Switch(True),
                 self.camera_status_connected()
             ]
@@ -231,7 +198,11 @@ class kiz_UI(Structure_UI):
                 self.set_statusbar_string("This button is not working.!")
             ]
         )
-
+        self.camera_video_capture_button.clicked.connect(
+            lambda:[
+                # buraya video kaydetme fonksiyonu eklenecek
+            ]
+        )
     def closeEvent(self, *args, **kwargs):
         super(kiz_UI, self).closeEvent(*args, **kwargs)
 
