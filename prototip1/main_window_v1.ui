@@ -210,13 +210,13 @@
        <item>
         <widget class="QPushButton" name="camera_video_capture_button">
          <property name="sizePolicy">
-          <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+          <sizepolicy hsizetype="Fixed" vsizetype="Minimum">
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
          </property>
          <property name="text">
-          <string>Record Video</string>
+          <string>Start Video Record</string>
          </property>
         </widget>
        </item>

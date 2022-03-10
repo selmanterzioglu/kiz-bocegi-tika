@@ -18,6 +18,9 @@ class kiz_UI(Structure_UI):
         self.is_Camera_Stream_Active = False
         self.logger_level = logger_level
         self.connected_camera_list = list()
+        
+        self.video_capture_mod = False
+        self.video_directory = "video_data_folder/"
 
         self.system_o = System_Object()
         self.system_o.thread_print_info()
@@ -109,8 +112,8 @@ class kiz_UI(Structure_UI):
         counter=0
         for i in range(1,available_cameras_counter+1):
             cam_string = "camera_{}".format(i)
-            self.cameras[cam_string].api_CV2_Camera_Create_Instance(self.available_cameras[counter], extra_params = []),
             self.camera_Initializes(camera_number=i)
+            self.cameras[cam_string].api_CV2_Camera_Create_Instance(self.available_cameras[counter], extra_params = []),
             counter +=1
 
     def camera_status_clear(self, counter):
@@ -172,15 +175,45 @@ class kiz_UI(Structure_UI):
     def set_statusbar_string(self, message):
         self.statusBar().showMessage(message)
 
+    
     def video_capture(self):
         available_cameras_counter = len(self.available_cameras)
+        
+        if self.video_capture_mod == False:
+            for i in range(1,available_cameras_counter+1):
+                cam_string = "camera_{}".format(i)
+                # self.cameras[cam_string].buffer_Clear()
+                self.cameras[cam_string].save_Video_From_Buffer_Thread(
+                    trigger_pause=None,
+                    trigger_quit=None,
+                    number_of_snapshot=-1,
+                    delay=0.001
+                )
 
-        for i in range(1,available_cameras_counter+1):
-            cam_string = "camera_{}".format(i)
-            self.cameras[cam_string]
 
+            self.camera_video_capture_button.setText("Stop Video Record")
+            self.video_capture_mod = True
+        else:
+            for i in range(1,available_cameras_counter+1):
+                cam_string = "camera_{}".format(i)
+                self.cameras[cam_string].camera_Releaser()
+
+                self.video_capture_mod = False
+                self.camera_video_capture_button.setText("Start Video Record")
+
+    
+    def connect_camera_button_clicked(self):
+        lambda: [
+                self.camera_qtimer_creater_runer(),
+                self.camera_status_clear(self.max_camera_numbers),
+                self.autonomous_Camera_Instance(),
+                self.autonomous_Camera_Thread_Starter(),
+                self.stream_Switch(True),
+                self.camera_status_connected()
+            ]
+    
     def configure_Button_Connections(self):
-        self.connect_camera_button.clicked.connect(            
+        self.connect_camera_button.clicked.connect(       
             lambda: [
                 self.camera_qtimer_creater_runer(),
                 self.camera_status_clear(self.max_camera_numbers),
@@ -200,9 +233,18 @@ class kiz_UI(Structure_UI):
         )
         self.camera_video_capture_button.clicked.connect(
             lambda:[
+                self.camera_qtimer_creater_runer(),
+                self.camera_status_clear(self.max_camera_numbers),
+                self.autonomous_Camera_Instance(),
+                self.autonomous_Camera_Thread_Starter(),
+                self.stream_Switch(True),
+                self.camera_status_connected(),
+             
+                self.video_capture()
                 # buraya video kaydetme fonksiyonu eklenecek
             ]
         )
+   
     def closeEvent(self, *args, **kwargs):
         super(kiz_UI, self).closeEvent(*args, **kwargs)
 
