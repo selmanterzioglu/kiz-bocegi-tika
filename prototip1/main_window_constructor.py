@@ -200,18 +200,15 @@ class kiz_UI(Structure_UI):
 
                 self.video_capture_mod = False
                 self.camera_video_capture_button.setText("Start Video Record")
-
     
     def connect_camera_button_clicked(self):
-        lambda: [
-                self.camera_qtimer_creater_runer(),
-                self.camera_status_clear(self.max_camera_numbers),
-                self.autonomous_Camera_Instance(),
-                self.autonomous_Camera_Thread_Starter(),
-                self.stream_Switch(True),
-                self.camera_status_connected()
-            ]
-    
+        self.camera_qtimer_creater_runer()
+        self.camera_status_clear(self.max_camera_numbers)
+        self.autonomous_Camera_Instance()
+        self.autonomous_Camera_Thread_Starter()
+        self.stream_Switch(True)
+        self.camera_status_connected()
+            
     def configure_Button_Connections(self):
         self.connect_camera_button.clicked.connect(       
             lambda: [
