@@ -4,7 +4,7 @@ from datetime import datetime
 import time
 import os
 
-class videoProcess():
+class File_Process():
     
     def __init__(self):
         self.path = ""
@@ -27,31 +27,6 @@ class videoProcess():
         fs.setPath(fs.get_current_path_os() + "/" + mainDirectory)
         self.path = fs.get_current_path_os()
 
-    def captureVideo(self, videoFormat, videoDuration):
-        video = cv2.VideoCapture(0)
-        frame_width = int(video.get(3))
-        frame_height = int(video.get(4))
-        size = (frame_width, frame_height)
-        
-        fileName = self.createVideoName() + videoFormat
-        print(type(fileName))
-        print(fileName)
-        
-        result = cv2.VideoWriter("2021-11-12-16:46:24.mp4",
-                                cv2.VideoWriter_fourcc(*'MP4V'),
-                                20.0,size)
-        
-        start = time.time()
-        while(int(time.time() - start) < videoDuration):
-            now = int (time.time() - start)
-            ret, frame = video.read()
-
-            if ret == True:     
-                result.write(frame)
-
-        video.release()
-        result.release()
-        cv2.destroyAllWindows()
 
 if __name__ == '__main__':
     a = videoProcess()
