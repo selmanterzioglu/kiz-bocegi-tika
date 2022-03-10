@@ -1,7 +1,7 @@
 /*
-  Asagidaki kodlar'da zamaninda yuksek tecrubeleriyle bize katki saglamis Sn. Said Bilgehan'in buyuk  katkileri bulunmaktadir. 
+  Asagidaki kodlar'da zamaninda yuksek tecrubeleriyle bize desteklerini esirgemeyen Sn. Said Bilgehan'in buyuk  katkileri bulunmaktadir. 
   Bu katki, emek ve destekleri sebebiyle 
-  Sn. Bilgehan anisina aracimizin gomulu kodlarinda ismini saygiyla aniyoruz...
+  Sn. Bilgehan anisina aracimizin gomulu kodlarinda ismini saygiyla aniyor ve yasatiyoruz...
 */
 
 ///////////////////////
