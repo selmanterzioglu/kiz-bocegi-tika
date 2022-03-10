@@ -28,6 +28,7 @@ class kiz_UI(Structure_UI):
     def camera_qtimer_creater_runer(self):
         self.available_cameras = self.get_camera_available_port()
         available_cameras_counter = len(self.available_cameras)
+        print("DEBUG:","available_cameras_counter",available_cameras_counter )
         if available_cameras_counter == 0:
             print("your camera/s is not available")
         else:    
@@ -174,7 +175,6 @@ class kiz_UI(Structure_UI):
             
     def set_statusbar_string(self, message):
         self.statusBar().showMessage(message)
-
     
     def video_capture(self):
         available_cameras_counter = len(self.available_cameras)
@@ -255,7 +255,7 @@ class kiz_UI(Structure_UI):
         source = 10
         available_port = []
         
-        while source >0:
+        while source >=0:
             try:
                 camera = cv2.VideoCapture(source, cv2.CAP_DSHOW)
                 is_reading, img = camera.read()
