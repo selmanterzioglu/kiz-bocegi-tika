@@ -1,6 +1,7 @@
 import libs
 from structure_ui import init_and_run_UI
-from main_window_constructor import kiz_UI
+# from main_window_constructor import kiz_UI
+from gui_test_script import kiz_UI
 
 if __name__ == "__main__":
     
