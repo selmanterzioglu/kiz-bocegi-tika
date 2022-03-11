@@ -24,8 +24,8 @@ class kiz_UI(Structure_Ui_Camera):
         self.video_capture_mod = False
         self.video_directory = "video_data_folder/"
 
-        # self.system_o = System_Object()
-        # self.system_o.thread_print_info()
+        self.system_o = System_Object()
+        self.system_o.thread_print_info()
         
     def camera_qtimer_creater_runer(self):
         self.available_cameras = self.get_camera_available_port()
@@ -177,51 +177,43 @@ class kiz_UI(Structure_Ui_Camera):
     def set_statusbar_string(self, message):
         self.statusBar().showMessage(message)
     
+    def camera_set_resolution(self, width, height):
+        self.available_cameras = self.get_camera_available_port()
+        available_cameras_counter = len(self.available_cameras)
+        
+        for i in range(1,available_cameras_counter+1):
+                cam_string = "camera_{}".format(i)
+                self.cameras[cam_string].cv2_Set_Camera_Size((width,height))
+
+                print(self.cameras[cam_string].get_Camera_Size()[0],
+                      self.cameras[cam_string].get_Camera_Size()[1]
+                      )
+
     def video_capture(self):
         self.connect_camera_button_clicked()
         available_cameras_counter = len(self.available_cameras)
         
         file_process = File_Process(video_data_directory_name="video_data_folder")
         file_process.set_video_extension("avi")
-
-        cam_string = "camera_1"
-
-        video_name = file_process.get_video_name() + cam_string
-        path=file_process.get_data_folder_path()
+        path = file_process.get_data_folder_path()
         extension = file_process.get_video_extension()
 
-        self.cameras[cam_string].save_Video_From_Buffer_Thread(
-            path=path, 
-            name=video_name, 
-            extension=extension, 
-            fps=120,
-            trigger_pause=self.is_Stream_Active, 
-            trigger_quit=None, 
-            number_of_snapshot=-1, 
-            delay=0.001
-        )
-
-
         if self.video_capture_mod == False:
-        #     for i in range(1,available_cameras_counter+1):
-        #         cam_string = "camera_{}".format(i)
-        #         video_name = file_process.get_video_name() + cam_string
+            for i in range(1,available_cameras_counter+1):
+                cam_string = "camera_{}".format(i)
+                video_name = file_process.get_video_name() + cam_string
+                # self.cameras[cam_string].buffer_Clear()
 
-        #         self.cameras[cam_string].buffer_Clear()
-
-        #         self.cameras[cam_string].save_Video_From_Buffer_Thread(
-
-        #             path=file_process.get_video_file_path(), 
-        #             name=file_process.get_video_name(), 
-        #             extension=file_process.get_video_extension(), 
-        #             fps=120,
-        #             trigger_pause=self.is_Stream_Active, 
-        #             trigger_quit=None, 
-        #             number_of_snapshot=-1, 
-        #             delay=0.001
-        #         )
-            
-
+                self.cameras[cam_string].save_Video_From_Buffer_Thread(
+                    path=path, 
+                    name=video_name, 
+                    extension=extension, 
+                    fps=24,
+                    trigger_pause=self.is_Stream_Active, 
+                    trigger_quit=None, 
+                    number_of_snapshot=-1, 
+                    delay=0.0001
+                )
 
             self.camera_video_capture_button.setText("Stop Video Record")
             self.video_capture_mod = True
@@ -237,6 +229,7 @@ class kiz_UI(Structure_Ui_Camera):
         self.camera_qtimer_creater_runer()
         self.camera_status_clear(self.max_camera_numbers)
         self.autonomous_Camera_Instance()
+        self.camera_set_resolution(width=1920, height=1080)
         self.autonomous_Camera_Thread_Starter()
         self.stream_Switch(True)
         self.camera_status_connected()
@@ -245,6 +238,7 @@ class kiz_UI(Structure_Ui_Camera):
         # self.camera_Remove(), # this button is beta version. it is not working
         self.camera_status_remove()
         self.set_statusbar_string("This button is not working.!")
+        
 
     def configure_Button_Connections(self):
         self.connect_camera_button.clicked.connect(       
