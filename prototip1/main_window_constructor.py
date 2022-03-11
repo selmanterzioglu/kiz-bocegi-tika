@@ -1,3 +1,4 @@
+from distutils import extension
 import libs
 import logging
 from structure_ui import Structure_UI, Graphics_View
@@ -5,9 +6,10 @@ from structure_camera import Camera_Object, CAMERA_FLAGS
 from structure_system import System_Object
 import cv2
 import qt_tools
+from structure_ui_camera import Structure_Ui_Camera
+from video_file_process import File_Process
 
-
-class kiz_UI(Structure_UI):
+class kiz_UI(Structure_Ui_Camera):
     def __init__(self, *args, onj = None, logger_level = logging.INFO, **kwargs):
         super(kiz_UI, self).__init__(*args, **kwargs)
 
@@ -22,13 +24,12 @@ class kiz_UI(Structure_UI):
         self.video_capture_mod = False
         self.video_directory = "video_data_folder/"
 
-        self.system_o = System_Object()
-        self.system_o.thread_print_info()
+        # self.system_o = System_Object()
+        # self.system_o.thread_print_info()
         
     def camera_qtimer_creater_runer(self):
         self.available_cameras = self.get_camera_available_port()
         available_cameras_counter = len(self.available_cameras)
-        print("DEBUG:","available_cameras_counter",available_cameras_counter )
         if available_cameras_counter == 0:
             print("your camera/s is not available")
         else:    
@@ -177,18 +178,49 @@ class kiz_UI(Structure_UI):
         self.statusBar().showMessage(message)
     
     def video_capture(self):
+        self.connect_camera_button_clicked()
         available_cameras_counter = len(self.available_cameras)
         
+        file_process = File_Process(video_data_directory_name="video_data_folder")
+        file_process.set_video_extension("avi")
+
+        cam_string = "camera_1"
+
+        video_name = file_process.get_video_name() + cam_string
+        path=file_process.get_data_folder_path()
+        extension = file_process.get_video_extension()
+
+        self.cameras[cam_string].save_Video_From_Buffer_Thread(
+            path=path, 
+            name=video_name, 
+            extension=extension, 
+            fps=120,
+            trigger_pause=self.is_Stream_Active, 
+            trigger_quit=None, 
+            number_of_snapshot=-1, 
+            delay=0.001
+        )
+
+
         if self.video_capture_mod == False:
-            for i in range(1,available_cameras_counter+1):
-                cam_string = "camera_{}".format(i)
-                # self.cameras[cam_string].buffer_Clear()
-                self.cameras[cam_string].save_Video_From_Buffer_Thread(
-                    trigger_pause=None,
-                    trigger_quit=None,
-                    number_of_snapshot=-1,
-                    delay=0.001
-                )
+        #     for i in range(1,available_cameras_counter+1):
+        #         cam_string = "camera_{}".format(i)
+        #         video_name = file_process.get_video_name() + cam_string
+
+        #         self.cameras[cam_string].buffer_Clear()
+
+        #         self.cameras[cam_string].save_Video_From_Buffer_Thread(
+
+        #             path=file_process.get_video_file_path(), 
+        #             name=file_process.get_video_name(), 
+        #             extension=file_process.get_video_extension(), 
+        #             fps=120,
+        #             trigger_pause=self.is_Stream_Active, 
+        #             trigger_quit=None, 
+        #             number_of_snapshot=-1, 
+        #             delay=0.001
+        #         )
+            
 
 
             self.camera_video_capture_button.setText("Stop Video Record")
@@ -208,38 +240,22 @@ class kiz_UI(Structure_UI):
         self.autonomous_Camera_Thread_Starter()
         self.stream_Switch(True)
         self.camera_status_connected()
-            
+    
+    def remove_camera_button_clicked(self):
+        # self.camera_Remove(), # this button is beta version. it is not working
+        self.camera_status_remove()
+        self.set_statusbar_string("This button is not working.!")
+
     def configure_Button_Connections(self):
         self.connect_camera_button.clicked.connect(       
-            lambda: [
-                self.camera_qtimer_creater_runer(),
-                self.camera_status_clear(self.max_camera_numbers),
-                self.autonomous_Camera_Instance(),
-                self.autonomous_Camera_Thread_Starter(),
-                self.stream_Switch(True),
-                self.camera_status_connected()
-            ]
+            self.connect_camera_button_clicked
         )
         self.remove_camera_button.clicked.connect(
-            lambda:[
-                # self.camera_Remove(), # this button is beta version. it is not working
-                
-                self.camera_status_remove(),
-                self.set_statusbar_string("This button is not working.!")
-            ]
+            self.remove_camera_button_clicked
         )
         self.camera_video_capture_button.clicked.connect(
-            lambda:[
-                self.camera_qtimer_creater_runer(),
-                self.camera_status_clear(self.max_camera_numbers),
-                self.autonomous_Camera_Instance(),
-                self.autonomous_Camera_Thread_Starter(),
-                self.stream_Switch(True),
-                self.camera_status_connected(),
-             
-                self.video_capture()
-                # buraya video kaydetme fonksiyonu eklenecek
-            ]
+            self.video_capture
+            # buraya video kaydetme fonksiyonu eklenecek
         )
    
     def closeEvent(self, *args, **kwargs):
@@ -258,12 +274,12 @@ class kiz_UI(Structure_UI):
                 is_reading, img = camera.read()
                 if camera.isOpened() and is_reading is True:
                     available_port.append(source)  
+                
+                camera.release()
+                cv2.destroyAllWindows()
             except TypeError:
                 pass
-            camera.release()
-            cv2.destroyAllWindows()
             source -= 1
-        
         return available_port
 
     def is_Stream_Active(self):
