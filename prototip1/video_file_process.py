@@ -1,55 +1,64 @@
 from datetime import datetime
+import os
 
+"""
+Usage Guide:
+    test_object = File_Process(video_data_directory_name="video_data_folder")
+"""
 class File_Process():
-    
-    def __init__(self,
-                 video_file_path,
-                 video_name,
-                 video_extension,
-                ):
 
+    def __init__(self, video_data_directory_name):
+        self.video_data_directory_name = video_data_directory_name
+        self.video_name = self.generate_video_name()
+        self.video_extension = None
+        self.data_folder_path = None
 
-        self.video_file_path = video_file_path
-        self.video_name = video_name
-        self.video_extension = video_extension
         self.create_data_folder()
+        self.update_data_folder_path()
 
+    def update_data_folder_path(self):
+        self.data_folder_path = self.get_path_os() + "\\" +  self.video_data_directory_name + "\\" 
+    
+    def create_data_folder(self):
+        self.make_directory(self.video_data_directory_name)
 
-    def create_video_name(self):
+    def make_directory(self, new_directory_name):
+        try: 
+            os.makedirs(new_directory_name)
+        except FileExistsError:
+            pass
+
+    def generate_video_name(self):
         date = datetime.now()
-        year = datetime.strftime(date, '%Y')
-        month = datetime.strftime(date, '%m')
-        day = datetime.strftime(date, '%d')
-        hour = datetime.strftime(date, '%X')
-        videoName = "{}-{}-{}-{}".format(year, month, day,hour)
+        year = date.year
+        month = date.month
+        day = date.day
+        hour = date.hour
+        minute = date.minute
+        second = date.second
+        
+        videoName = "{}-{}-{}_{}-{}-{}_".format(day, month, year, hour, minute, second)
         
         return videoName
-
-    def create_data_folder(self):
-        fs = FileProcess()
-        fs.make_directory(fs.get_current_path_os(), self.video_file_path)
-        fs.setPath(fs.get_current_path_os() + "/" + self.video_file_path)
-        self.path = fs.get_current_path_os()
-
-    def get_video_file_path(self):
-        return self.video_file_path
     
     def get_video_name(self):
         return self.video_name
-    
-    def get_video_extension(self):
-        return self.video_name
 
-    def set_video_file_path(self, video_file_path ):
-        self.video_file_path = video_file_path  
+    def get_video_extension(self):
+        return self.video_extension
     
-    def set_video_name(self, set_video_name):
-        self.video_name = set_video_name
+    def get_data_folder_path(self):
+        return self.data_folder_path
     
+    def get_path_os(self):
+        return os.getcwd()
+        
     def set_video_extension(self, video_extension):
         self.video_extension = video_extension
 
-if __name__ == '__main__':
-    a = File_Process("video_data_folder", video_name="video_name", video_extension="video_extension")
-    print(a.createVideoName())
+    def set_video_name(self, video_name):
+        self.video_name = video_name
 
+if __name__ == "__main__":
+    a = File_Process(video_data_directory_name="video_data_folder")
+    print(a.get_video_name())
