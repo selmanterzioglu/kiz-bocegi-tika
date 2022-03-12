@@ -30,46 +30,17 @@ class kiz_UI(Structure_Ui_Camera):
         self.system_o.thread_print_info()
         
     def camera_qtimer_creater_runer(self):
-        self.available_cameras = self.get_camera_available_port()
-        available_cameras_counter = len(self.available_cameras)
-        if available_cameras_counter == 0:
-            print("your camera/s is not available")
-        else:    
-            if available_cameras_counter >= 1:
-                self.q_timers["camera_1_renderer"] = qt_tools.qtimer_Create_And_Run(
-                    self,
-                    connection=self.camera_1_renderer,
-                    delay=10,
-                    is_needed_start=True,
-                    is_single_shot=False
-                )   
-            if available_cameras_counter >= 2:
-                self.q_timers["camera_2_renderer"] = qt_tools.qtimer_Create_And_Run(
-                    self,
-                    connection=self.camera_2_renderer,
-                    delay=10,
-                    is_needed_start=True,
-                    is_single_shot=False
-                )
-            if available_cameras_counter >= 3:
-                self.q_timers["camera_3_renderer"] = qt_tools.qtimer_Create_And_Run(
-                    self,
-                    connection=self.camera_3_renderer,
-                    delay=10,
-                    is_needed_start=True,
-                    is_single_shot=False
-                )
-            if available_cameras_counter >= 4:
-                self.q_timers["camera_4_renderer"] = qt_tools.qtimer_Create_And_Run(
-                    self,
-                    connection=self.camera_4_renderer,
-                    delay=10,
-                    is_needed_start=True,
-                    is_single_shot=False
-                )
-       
+        
+        self.q_timers["camera_1_renderer"] = qt_tools.qtimer_Create_And_Run(
+            self,
+            connection=self.camera_1_renderer,
+            delay=10,
+            is_needed_start=True,
+            is_single_shot=False
+        )   
+ 
     def camera_Initializes(self, camera_number):
-        camera_string = "camera_" + str(camera_number)
+        camera_string = "camera_1"
         if not self.cameras.get(camera_string):
             self.cameras[camera_string] = Camera_Object(
                 camera_flag=CAMERA_FLAGS.CV2,
@@ -81,26 +52,16 @@ class kiz_UI(Structure_Ui_Camera):
                 acquisition_framerate=30,
                 # exposure_time=exposure_time,
                 # max_buffer_limit=buffer_size,
-                max_buffer_limit=10
+                max_buffer_limit=1
                 # logger_level=self.logger_level
             ) 
 
+
     def camera_1_renderer(self):
         if self.cameras.get("camera_1"):
-            self.frame_1.set_Background_Image(self.cameras["camera_1"].stream_Returner(auto_pop=True, pass_broken=True))
-    
-    def camera_2_renderer(self):
-        if self.cameras.get("camera_2"):
-            self.frame_2.set_Background_Image(self.cameras["camera_2"].stream_Returner(auto_pop=True, pass_broken=True))
-    
-    def camera_3_renderer(self):
-        if self.cameras.get("camera_3"):
-            self.frame_3.set_Background_Image(self.cameras["camera_3"].stream_Returner(auto_pop=True, pass_broken=True))
-    
-    def camera_4_renderer(self):
-        if self.cameras.get("camera_4"):
-            self.frame_4.set_Background_Image(self.cameras["camera_4"].stream_Returner(auto_pop=True, pass_broken=True))
-    
+            # klasore kaydetme threadı eklenecek
+            self.frame_1.set_Background_Image(self.cameras["camera_1"].stream_Returner(auto_pop=False, pass_broken=True))
+
     def camera_Remove(self):
         # if self.is_Camera_Instance_Exist():
         self.stream_Switch(False)
@@ -112,13 +73,9 @@ class kiz_UI(Structure_Ui_Camera):
             self.cameras.pop(key)
     
     def autonomous_Camera_Instance(self):
-        available_cameras_counter = len(self.available_cameras)
-        counter=0
-        for i in range(1,available_cameras_counter+1):
-            cam_string = "camera_{}".format(i)
-            self.camera_Initializes(camera_number=i)
-            self.cameras[cam_string].api_CV2_Camera_Create_Instance(self.available_cameras[counter], extra_params = []),
-            counter +=1
+        cam_string = "camera_1"
+        self.camera_Initializes(camera_number=1)
+        self.cameras[cam_string].api_CV2_Camera_Create_Instance(0, extra_params = [])
 
     def camera_status_clear(self, counter):
         if counter >= 1:
@@ -165,76 +122,71 @@ class kiz_UI(Structure_Ui_Camera):
 
     def autonomous_Camera_Thread_Starter(self):
         """This function start camera thread functions"""
+        cam_string = "camera_1"
 
-        available_cameras_counter = len(self.available_cameras)
-        for i in range(1,available_cameras_counter+1):
-            cam_string = "camera_{}".format(i)
-            self.cameras[cam_string].stream_Start_Thread(
-                    number_of_snapshot=-1,
-                    delay=0.001,
-                    trigger_pause=self.is_Stream_Active,
-                    trigger_quit=self.is_Quit_App
-            )
+        self.cameras["camera_1"].stream_Start_Thread( 
+            trigger_pause=self.is_Stream_Active, 
+            trigger_quit=self.is_Quit_App, 
+            number_of_snapshot=-1, 
+            delay=0.001, 
+        )
+   
+
             
     def set_statusbar_string(self, message):
         self.statusBar().showMessage(message)
     
     def camera_set_resolution(self, width, height):
-        self.available_cameras = self.get_camera_available_port()
-        available_cameras_counter = len(self.available_cameras)
         
-        for i in range(1,available_cameras_counter+1):
-                cam_string = "camera_{}".format(i)
-                self.cameras[cam_string].cv2_Set_Camera_Size((width,height))
-
-                print(self.cameras[cam_string].get_Camera_Size()[0],
-                      self.cameras[cam_string].get_Camera_Size()[1]
-                      )
+        cam_string = "camera_1"
+        self.cameras[cam_string].cv2_Set_Camera_Size((width,height))
+ 
+        # print(
+        #     self.cameras[cam_string].get_Camera_Size()[0],
+        #     self.cameras[cam_string].get_Camera_Size()[1]
+        # )
 
     def video_capture(self):
         self.connect_camera_button_clicked()
-        available_cameras_counter = len(self.available_cameras)
         
+
         file_process = File_Process(video_data_directory_name="video_data_folder")
-        file_process.set_video_extension("avi")
+        file_process.set_video_extension("mp4")
         path = file_process.get_data_folder_path()
         extension = file_process.get_video_extension()
 
+        cam_string = "camera_1"
+        video_name = "camera_1"
+        # self.cameras[cam_string].buffer_Clear()
+        print("is_Stream_Active", self.is_Stream_Active)
+        # print(self.cameras[cam_string].get_Camera_Size()[0],self.cameras[cam_string].get_Camera_Size()[1])
         if self.video_capture_mod == False:
-            for i in range(1,available_cameras_counter+1):
-                cam_string = "camera_{}".format(i)
-                video_name = file_process.get_video_name() + cam_string
-                # self.cameras[cam_string].buffer_Clear()
 
-                self.cameras[cam_string].save_Video_From_Buffer_Thread(
-                    path=path, 
-                    name=video_name, 
-                    extension=extension, 
-                    fps=30,
-                    trigger_pause=self.is_Stream_Active, 
-                    trigger_quit=self.is_Quit_App, 
-                    number_of_snapshot=-1, 
-                    delay=0.0001
-                )
+            self.cameras[cam_string].save_Video_From_Buffer_Thread(
+                path=path, 
+                name=video_name, 
+                extension=extension, 
+                fps=11,
+                trigger_pause=self.is_Stream_Active, 
+                trigger_quit=self.is_Quit_App, 
+                number_of_snapshot=-1, 
+                delay=0.0001
+            )
 
-            self.camera_video_capture_button.setText("Stop Video Record")
             self.video_capture_mod = True
+            self.camera_video_capture_button.setText("Stop Video Record")
         else:
-            for i in range(1,available_cameras_counter+1):
-                cam_string = "camera_{}".format(i)
-                self.cameras[cam_string].camera_Releaser()
-
-                self.video_capture_mod = False
-                self.camera_video_capture_button.setText("Start Video Record")
+            self.stream_Switch(False)
+            self.video_capture_mod = False
+            self.camera_video_capture_button.setText("Start Video Record")
     
     def connect_camera_button_clicked(self):
         self.camera_qtimer_creater_runer()
-        self.camera_status_clear(self.max_camera_numbers)
         self.autonomous_Camera_Instance()
-        # self.camera_set_resolution(width=1920, height=1080)
+        self.camera_set_resolution(width=1920, height=1080)
         self.autonomous_Camera_Thread_Starter()
         self.stream_Switch(True)
-        self.camera_status_connected()
+        # self.camera_status_connected()
     
     def remove_camera_button_clicked(self):
         # self.camera_Remove(), # this button is beta version. it is not working
