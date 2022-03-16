@@ -20,33 +20,36 @@ class Camera_Object_2(Camera_Object):
         self.counter = 0
         self.output_fps = 1
         self.name = custom_name
-        
+        self.__thread_Dict = dict()
+
     def image_write(self, snapshot):
         self.counter += 1
         image_name = "video_data_folder\\{}\\temp\\{}.jpg".format(self.name, str(self.counter))
         if (self.counter % self.output_fps) == 0:
             cv2.imwrite(image_name, snapshot)
 
-    def image_merge(self):
+    def image_merge(self, trigger_pause=None, trigger_quit=None, number_of_snapshot=-1, delay=0.001, trigger_before=None, trigger_after=None):
 
         file_process = File_Process(video_data_directory_name="video_data_folder")
         path = file_process.get_data_folder_path()
         generated_video_name = file_process.get_video_name()
+        video_extension = file_process.get_video_extension()
 
-        video_name = "{}{}\\temp".format(path, self.name)
+        video_path = "{}{}".format(path, self.name)
+
+        video_name = "{}\\{}.avi".format(video_path, generated_video_name)
         size = (1920, 1080)
         fps = 30
         fourcc = cv2.VideoWriter_fourcc(*'mp4v') 
 
-        print("DEBUG: {}".format(video_name))
-        
         output = cv2.VideoWriter(
-            video_name + generated_video_name,
+            video_name,
             fourcc, 
             fps, size
         )
 
-        file_list = list_files(path=video_name + "\\", extensions=['.jpg'], is_sorted=True, recursive=False)
+        file_list = list_files(path=video_path + "\\temp\\", extensions=['.jpg'], is_sorted=True, recursive=False)
+
         for filename in file_list:
             output.write(
                 cv2.imread(filename)
@@ -55,7 +58,8 @@ class Camera_Object_2(Camera_Object):
         cv2.destroyAllWindows()
         print("\nVIDEO YAZMA ISLEMI BITTI\n\n")
 
-    def image_merge_Thread(self, trigger_pause=None, trigger_quit=None, delay=0.001, trigger_before=None, trigger_after=None):
+    def image_merge_Thread(self, trigger_pause=None, trigger_quit=None, number_of_snapshot=-1, delay=0.001, trigger_before=None, trigger_after=None):
+
         if self.get_Is_Object_Initialized():
             self.__thread_Dict["image_merge_Thread"] = Thread_Object(
                 name="Camera_Object.image_merge_Thread",
@@ -63,12 +67,13 @@ class Camera_Object_2(Camera_Object):
                 logger_level=self.logger.getEffectiveLevel(),
                 set_Deamon=True,
                 run_number=1,
-                quit_trigger=trigger_quit
+                quit_trigger=None
             )
             self.__thread_Dict["image_merge_Thread"].init(
                 params=[
                     trigger_pause,
                     trigger_quit,
+                    number_of_snapshot,
                     delay,
                     trigger_before, 
                     trigger_after
@@ -77,7 +82,7 @@ class Camera_Object_2(Camera_Object):
             )
             self.__thread_Dict["image_merge_Thread"].start()
 
-            return self.__thread_Dict["stream_Start_Thread"]
+            return self.__thread_Dict["image_merge_Thread"]
         else:
             return None
 
@@ -86,13 +91,13 @@ class kiz_UI(Structure_UI):
 
     def __init__(self, *args, onj = None, logger_level = logging.INFO, **kwargs):
         self.init_QTimers = lambda: None
-        
         super(kiz_UI, self).__init__(*args, **kwargs)
 
         self.cameras = dict()
         self.q_timers = dict()
         self.gui_widgets = dict()
         self.status_string = dict()
+        self.__thread_Dict = dict()
 
         self.available_cameras = None
         self.max_camera_numbers = 4
@@ -100,23 +105,79 @@ class kiz_UI(Structure_UI):
         self.logger_level = logger_level
         self.connected_camera_list = list()
         self.available_cameras_counter = 0
-
         self.video_capture_mod = False
         self.video_directory = "video_data_folder/"
+        self.is_Object_Initialized = True
+
+        self.init()
+    
+    def init(self):
+        self.name = "KizUI"
+        self.logger = logging.getLogger(self.name)
+
+        self.system_o = System_Object()
+        # self.system_o.thread_print_info()
 
         self.set_widgets()
-        self.system_o = System_Object()
-        self.system_o.thread_print_info()
-    
-    
+        self.print_system_info_Thread(trigger_pause=None, trigger_quit=None, number_of_snapshot=-1, delay=0.001, trigger_before=None, trigger_after=None)
+
+    def print_system_info_Thread(self, trigger_pause=None, trigger_quit=None, number_of_snapshot=-1, delay=0.001, trigger_before=None, trigger_after=None):
+
+        if self.get_Is_Object_Initialized():
+            self.__thread_Dict["print_system_info_Thread"] = Thread_Object(
+                name="Camera_Object.print_system_info_Thread",
+                delay=0.0001,
+                logger_level=self.logger.getEffectiveLevel(),
+                set_Deamon=True,
+                run_number=None,
+                quit_trigger=None
+            )
+            self.__thread_Dict["print_system_info_Thread"].init(
+                params=[
+                    trigger_pause,
+                    trigger_quit,
+                    number_of_snapshot,
+                    delay,
+                    trigger_before, 
+                    trigger_after
+                ],
+                task=self.init_gui_thread
+            )
+            self.__thread_Dict["print_system_info_Thread"].start()
+
+            return self.__thread_Dict["print_system_info_Thread"]
+        else:
+            return None
+
+    def set_widgets(self):
+        self.gui_widgets["cam_1_status_label"] = self.cam_1_status_label
+        self.gui_widgets["cam_2_status_label"] = self.cam_2_status_label
+        self.gui_widgets["cam_3_status_label"] = self.cam_3_status_label
+        self.gui_widgets["cam_4_status_label"] = self.cam_4_status_label
+
+        self.gui_widgets["camera_video_capture_button"] = self.camera_video_capture_button
+        self.gui_widgets["connect_camera_button"] = self.connect_camera_button
+        self.gui_widgets["remove_camera_button"] = self.remove_camera_button
+
+        self.gui_widgets["label_used_cpu"] = self.label_used_cpu
+        self.gui_widgets["label_used_memory"] = self.label_used_memory
+
+    def init_gui_thread(self, trigger_pause=None, trigger_quit=None, number_of_snapshot=-1, delay=0.001, trigger_before=None, trigger_after=None):
+        cpu_percent = "Used CPU: {}".format(self.system_o.cpu_percent_Psutil())        
+        memory_usage = "Used Memory: {:.2f} MB".format(self.system_o.memory_Usage_Psutil())        
+
+        self.gui_widgets["label_used_cpu"].setText(cpu_percent)
+        self.gui_widgets["label_used_memory"].setText(memory_usage)
+
     def camera_video_capture_button_clicked(self):
-        self.available_cameras = self.get_camera_available_port()
-        self.available_cameras_counter = len(self.available_cameras)
+        
 
         if self.is_video_capture_mod():
             self.stop_video_record()
         else:
-           self.record_video()
+            self.available_cameras = self.get_camera_available_port()
+            self.available_cameras_counter = len(self.available_cameras)
+            self.start_video_record()
 
     def connect_camera_button_clicked(self):
         self.available_cameras = self.get_camera_available_port()
@@ -137,7 +198,8 @@ class kiz_UI(Structure_UI):
 
     def stop_video_record(self):
         self.stream_Switch(False)
-        for i in range(1,self.available_cameras_counter+1):
+        
+        for i in range(1,self.available_cameras_counter + 1):
             cam_string = "camera_{}".format(i)
             self.cameras[cam_string].image_merge_Thread(
                 trigger_pause=None,
@@ -148,7 +210,7 @@ class kiz_UI(Structure_UI):
             )
         self.gui_widgets["camera_video_capture_button"].setText("Start Video Record")
 
-    def record_video(self):
+    def start_video_record(self, trigger_pause=None, trigger_quit=None, number_of_snapshot=-1, delay=0.001, trigger_before=None, trigger_after=None):
         file_process = File_Process(video_data_directory_name="video_data_folder")
         file_process.set_video_extension("avi")
 
@@ -168,7 +230,6 @@ class kiz_UI(Structure_UI):
 
         self.gui_widgets["camera_video_capture_button"].setText("Stop Video Record")
 
-
     def configure_Button_Connections(self):
         self.camera_video_capture_button.clicked.connect(
             self.camera_video_capture_button_clicked
@@ -180,16 +241,6 @@ class kiz_UI(Structure_UI):
             self.remove_camera_button_clicked
         )
    
-    def set_widgets(self):
-        self.gui_widgets["cam_1_status_label"] = self.cam_1_status_label
-        self.gui_widgets["cam_2_status_label"] = self.cam_2_status_label
-        self.gui_widgets["cam_3_status_label"] = self.cam_3_status_label
-        self.gui_widgets["cam_4_status_label"] = self.cam_4_status_label
-
-        self.gui_widgets["camera_video_capture_button"] = self.camera_video_capture_button
-        self.gui_widgets["connect_camera_button"] = self.connect_camera_button
-        self.gui_widgets["remove_camera_button"] = self.remove_camera_button
- 
     def set_video_capture_mod(self, bool):
         self.video_capture_mod = bool
 
@@ -367,3 +418,7 @@ class kiz_UI(Structure_UI):
             not self.is_Camera_Stream_Active \
             if bool is None else bool
         return self.is_Camera_Stream_Active
+
+    def get_Is_Object_Initialized(self):
+        return self.is_Object_Initialized
+   
