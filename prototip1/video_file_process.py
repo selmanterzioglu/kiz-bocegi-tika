@@ -1,4 +1,6 @@
 from datetime import datetime
+import glob
+from http.server import executable
 import os
 
 """
@@ -15,6 +17,18 @@ class File_Process():
 
         self.create_data_folder()
         self.update_data_folder_path()
+
+    def delete_files(self, file_path,  extension):
+        glob_string = "{}/*.{}".format(file_path, extension)
+
+        files = glob.glob(glob_string)
+
+        for f in files:
+            try:
+                os.remove(f)
+            except OSError as e:
+                print("Error: %s : %s" % (f, e.strerror))
+
 
     def update_data_folder_path(self):
         self.data_folder_path = self.get_path_os() + "\\" +  self.video_data_directory_name + "\\" 

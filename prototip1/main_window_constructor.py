@@ -1,4 +1,3 @@
-from distutils import extension
 from email.mime import image
 import glob
 import libs
@@ -11,21 +10,80 @@ import qt_tools
 from tools import list_files
 #from structure_ui_camera import Structure_Ui_Camera
 from video_file_process import File_Process
+from structure_threading import Thread_Object
 
+
+    
 class Camera_Object_2(Camera_Object):
     def __init__(self, *args, onj = None, logger_level = logging.INFO, custom_name, **kwargs):
         super(Camera_Object_2, self).__init__(*args, **kwargs)
         self.counter = 0
         self.output_fps = 1
         self.name = custom_name
-    
+        
     def image_write(self, snapshot):
         self.counter += 1
-        image_name = "video_data_folder\\{}\\{}.jpg".format(self.name, str(self.counter))
+        image_name = "video_data_folder\\{}\\temp\\{}.jpg".format(self.name, str(self.counter))
         if (self.counter % self.output_fps) == 0:
             cv2.imwrite(image_name, snapshot)
 
+    def image_merge(self):
+
+        file_process = File_Process(video_data_directory_name="video_data_folder")
+        path = file_process.get_data_folder_path()
+        generated_video_name = file_process.get_video_name()
+
+        video_name = "{}{}\\temp".format(path, self.name)
+        size = (1920, 1080)
+        fps = 30
+        fourcc = cv2.VideoWriter_fourcc(*'mp4v') 
+
+        print("DEBUG: {}".format(video_name))
+        
+        output = cv2.VideoWriter(
+            video_name + generated_video_name,
+            fourcc, 
+            fps, size
+        )
+
+        file_list = list_files(path=video_name + "\\", extensions=['.jpg'], is_sorted=True, recursive=False)
+        for filename in file_list:
+            output.write(
+                cv2.imread(filename)
+            )
+        output.release()
+        cv2.destroyAllWindows()
+        print("\nVIDEO YAZMA ISLEMI BITTI\n\n")
+
+    def image_merge_Thread(self, trigger_pause=None, trigger_quit=None, delay=0.001, trigger_before=None, trigger_after=None):
+        if self.get_Is_Object_Initialized():
+            self.__thread_Dict["image_merge_Thread"] = Thread_Object(
+                name="Camera_Object.image_merge_Thread",
+                delay=0.0001,
+                logger_level=self.logger.getEffectiveLevel(),
+                set_Deamon=True,
+                run_number=1,
+                quit_trigger=trigger_quit
+            )
+            self.__thread_Dict["image_merge_Thread"].init(
+                params=[
+                    trigger_pause,
+                    trigger_quit,
+                    delay,
+                    trigger_before, 
+                    trigger_after
+                ],
+                task=self.image_merge
+            )
+            self.__thread_Dict["image_merge_Thread"].start()
+
+            return self.__thread_Dict["stream_Start_Thread"]
+        else:
+            return None
+
+
 class kiz_UI(Structure_UI):
+
     def __init__(self, *args, onj = None, logger_level = logging.INFO, **kwargs):
         self.init_QTimers = lambda: None
         
@@ -33,25 +91,116 @@ class kiz_UI(Structure_UI):
 
         self.cameras = dict()
         self.q_timers = dict()
+        self.gui_widgets = dict()
+        self.status_string = dict()
+
         self.available_cameras = None
         self.max_camera_numbers = 4
         self.is_Camera_Stream_Active = False
         self.logger_level = logger_level
         self.connected_camera_list = list()
-        
+        self.available_cameras_counter = 0
+
         self.video_capture_mod = False
         self.video_directory = "video_data_folder/"
 
+        self.set_widgets()
         self.system_o = System_Object()
         self.system_o.thread_print_info()
-        
-    def camera_qtimer_creater_runer(self):
+    
+    
+    def camera_video_capture_button_clicked(self):
         self.available_cameras = self.get_camera_available_port()
-        available_cameras_counter = len(self.available_cameras)
-        if available_cameras_counter == 0:
+        self.available_cameras_counter = len(self.available_cameras)
+
+        if self.is_video_capture_mod():
+            self.stop_video_record()
+        else:
+           self.record_video()
+
+    def connect_camera_button_clicked(self):
+        self.available_cameras = self.get_camera_available_port()
+        self.available_cameras_counter = len(self.available_cameras)
+
+        self.camera_qtimer_creater_runer()
+        self.camera_status_clear(self.max_camera_numbers)
+        self.autonomous_Camera_Instance()
+        self.camera_set_resolution(width=1920, height=1080)
+        self.autonomous_Camera_Thread_Starter(is_record=None)
+        self.stream_Switch(True)
+        self.camera_status_connected()
+    
+    def remove_camera_button_clicked(self):
+        # self.camera_Remove(), # this button is beta version. it is not working
+        self.camera_status_remove()
+        self.set_statusbar_string("This button is not working.!")
+
+    def stop_video_record(self):
+        self.stream_Switch(False)
+        for i in range(1,self.available_cameras_counter+1):
+            cam_string = "camera_{}".format(i)
+            self.cameras[cam_string].image_merge_Thread(
+                trigger_pause=None,
+                trigger_quit= None,
+                delay=0.001,
+                trigger_before=None, 
+                trigger_after=None,
+            )
+        self.gui_widgets["camera_video_capture_button"].setText("Start Video Record")
+
+    def record_video(self):
+        file_process = File_Process(video_data_directory_name="video_data_folder")
+        file_process.set_video_extension("avi")
+
+        file_process.delete_files(file_path="video_data_folder\\camera_1\\temp", extension="jpg")
+        file_process.delete_files(file_path="video_data_folder\\camera_2\\temp", extension="jpg")
+        file_process.delete_files(file_path="video_data_folder\\camera_3\\temp", extension="jpg")
+        file_process.delete_files(file_path="video_data_folder\\camera_4\\temp", extension="jpg")
+
+        self.camera_qtimer_creater_runer()
+        self.camera_status_clear(self.max_camera_numbers)
+        self.autonomous_Camera_Instance()
+        self.camera_set_resolution(width=1920, height=1080)
+        self.autonomous_Camera_Thread_Starter(is_record=True)
+        self.stream_Switch(True)
+        self.camera_status_connected()
+        self.set_video_capture_mod(True)
+
+        self.gui_widgets["camera_video_capture_button"].setText("Stop Video Record")
+
+
+    def configure_Button_Connections(self):
+        self.camera_video_capture_button.clicked.connect(
+            self.camera_video_capture_button_clicked
+        )
+        self.connect_camera_button.clicked.connect(       
+            self.connect_camera_button_clicked
+        )
+        self.remove_camera_button.clicked.connect(
+            self.remove_camera_button_clicked
+        )
+   
+    def set_widgets(self):
+        self.gui_widgets["cam_1_status_label"] = self.cam_1_status_label
+        self.gui_widgets["cam_2_status_label"] = self.cam_2_status_label
+        self.gui_widgets["cam_3_status_label"] = self.cam_3_status_label
+        self.gui_widgets["cam_4_status_label"] = self.cam_4_status_label
+
+        self.gui_widgets["camera_video_capture_button"] = self.camera_video_capture_button
+        self.gui_widgets["connect_camera_button"] = self.connect_camera_button
+        self.gui_widgets["remove_camera_button"] = self.remove_camera_button
+ 
+    def set_video_capture_mod(self, bool):
+        self.video_capture_mod = bool
+
+    def is_video_capture_mod(self):
+        return self.video_capture_mod
+
+    def camera_qtimer_creater_runer(self):
+        if self.available_cameras_counter == 0:
             print("your camera/s is not available")
         else:    
-            if available_cameras_counter >= 1:
+            if self.available_cameras_counter >= 1:
                 self.q_timers["camera_1_renderer"] = qt_tools.qtimer_Create_And_Run(
                     self,
                     connection=self.camera_1_renderer,
@@ -59,7 +208,7 @@ class kiz_UI(Structure_UI):
                     is_needed_start=True,
                     is_single_shot=False
                 )   
-            if available_cameras_counter >= 2:
+            if self.available_cameras_counter >= 2:
                 self.q_timers["camera_2_renderer"] = qt_tools.qtimer_Create_And_Run(
                     self,
                     connection=self.camera_2_renderer,
@@ -67,7 +216,7 @@ class kiz_UI(Structure_UI):
                     is_needed_start=True,
                     is_single_shot=False
                 )
-            if available_cameras_counter >= 3:
+            if self.available_cameras_counter >= 3:
                 self.q_timers["camera_3_renderer"] = qt_tools.qtimer_Create_And_Run(
                     self,
                     connection=self.camera_3_renderer,
@@ -75,7 +224,7 @@ class kiz_UI(Structure_UI):
                     is_needed_start=True,
                     is_single_shot=False
                 )
-            if available_cameras_counter >= 4:
+            if self.available_cameras_counter >= 4:
                 self.q_timers["camera_4_renderer"] = qt_tools.qtimer_Create_And_Run(
                     self,
                     connection=self.camera_4_renderer,
@@ -126,179 +275,65 @@ class kiz_UI(Structure_UI):
             self.cameras.pop(key)
     
     def autonomous_Camera_Instance(self):
-        available_cameras_counter = len(self.available_cameras)
         counter=0
-        for i in range(1,available_cameras_counter+1):
+        for i in range(1,self.available_cameras_counter+1):
             cam_string = "camera_{}".format(i)
             self.camera_Initializes(camera_number=i)
             self.cameras[cam_string].api_CV2_Camera_Create_Instance(self.available_cameras[counter], extra_params = []),
             counter +=1
 
     def camera_status_clear(self, counter):
-        if counter >= 1:
-            self.cam_1_status_label.setText("")
-        if counter >= 2:
-            self.cam_2_status_label.setText("")
-        if counter >= 3:
-            self.cam_3_status_label.setText("")
-        if counter >= 4:
-            self.cam_4_status_label.setText("")
+        for i in range(1,counter+1):
+            label_string = "cam_{}_status_label".format(i)
+            message = "Cam {} Status:" + " camera is removed".format(i)
+            self.gui_widgets[label_string].setText("")
 
     def camera_status_remove(self):
-        available_cameras_counter = len(self.available_cameras)
-        self.camera_status_clear(available_cameras_counter)
+        self.camera_status_clear(self.available_cameras_counter)
 
-        if available_cameras_counter >= 1:
-            self.cam_1_status_label.setText("Cam 1 Status:" + " camera is removed")
-        if available_cameras_counter >= 2:
-            self.cam_2_status_label.setText("Cam 2 Status:" + " camera is removed")
-        if available_cameras_counter >= 3:
-            self.cam_3_status_label.setText("Cam 3 Status:" + " camera is removed")
-        if available_cameras_counter >= 4:
-            self.cam_4_status_label.setText("Cam 4 Status:" + " camera is removed")
+        for i in range(1,self.available_cameras_counter):
+            label_string = "cam_{}_status_label".format(i)
+            message = "Cam {} Status:" + " camera is removed".format(i)
+            self.gui_widgets[label_string].setText(message)
 
     def camera_status_default(self):
         self.camera_status_clear(self.max_camera_numbers)
-        self.cam_1_status_label.setText("Cam 1 Status:")
-        self.cam_2_status_label.setText("Cam 2 Status:")
-        self.cam_3_status_label.setText("Cam 3 Status:")
-        self.cam_4_status_label.setText("Cam 4 Status:")
+
+        for i in range(1,5):
+            label_string = "cam_{}_status_label".format(i)
+            message = "Cam {} Status:".format(i)
+            self.gui_widgets[label_string].setText(message)
 
     def camera_status_connected(self):
-        available_cameras_counter = len(self.available_cameras)
-        self.camera_status_clear(available_cameras_counter)
+        for i in range(1,self.available_cameras_counter + 1):
+            label_string = "cam_{}_status_label".format(i)
+            message = "Cam {} Status: ENABLED".format(i)
+            self.gui_widgets[label_string].setText(message)
 
-        if available_cameras_counter >= 1:
-            self.cam_1_status_label.setText("Cam 1 Status:" + " ENABLED")
-        if available_cameras_counter >= 2:
-            self.cam_2_status_label.setText("Cam 2 Status:" + " ENABLED")
-        if available_cameras_counter >= 3:
-            self.cam_3_status_label.setText("Cam 3 Status:" + " ENABLED")
-        if available_cameras_counter >= 4:
-            self.cam_4_status_label.setText("Cam 4 Status:" + " ENABLED")
-
-
-    def autonomous_Camera_Thread_Starter(self):
+    def autonomous_Camera_Thread_Starter(self, is_record = None):
         """This function start camera thread functions"""
-        output_fps = 1
-        available_cameras_counter = len(self.available_cameras)
-        for i in range(1,available_cameras_counter+1):
+        for i in range(1,self.available_cameras_counter + 1):
             cam_string = "camera_{}".format(i)
+
+            if is_record is not None:
+                is_record = self.cameras[cam_string].image_write
+            
             self.cameras[cam_string].stream_Start_Thread(
                 trigger_pause=self.is_Stream_Active,
-                trigger_quit=self.is_Quit_App,
+                trigger_quit= None,
                 number_of_snapshot=-1,
                 delay=0.001,
                 trigger_before=None, 
-                trigger_after=self.cameras[cam_string].image_write,
-                #camera_name = cam_string,
-                #output_fps = output_fps
-        )
+                trigger_after=is_record,
+            )
             
     def set_statusbar_string(self, message):
         self.statusBar().showMessage(message)
     
     def camera_set_resolution(self, width, height):
-        self.available_cameras = self.get_camera_available_port()
-        available_cameras_counter = len(self.available_cameras)
-        
-        for i in range(1,available_cameras_counter+1):
+        for i in range(1,self.available_cameras_counter+1):
                 cam_string = "camera_{}".format(i)
                 self.cameras[cam_string].cv2_Set_Camera_Size((width,height))
-
-                print(self.cameras[cam_string].get_Camera_Size()[0],
-                      self.cameras[cam_string].get_Camera_Size()[1]
-                      )
-
-    def image_merge(self):
-
-        file_process = File_Process(video_data_directory_name="video_data_folder")
-        file_process.set_video_extension("avi")
-        path = file_process.get_data_folder_path()
-        extension = file_process.get_video_extension()
-        video_name = path + "camera_1" 
-        size = (1280, 720)
-
-        fourcc = cv2.VideoWriter_fourcc(*'mp4v') 
-        print("video_name", video_name)
-        output = cv2.VideoWriter(
-            video_name + "\\camera_1.avi",
-            fourcc, 
-            30, size
-        )
-
-        file_list = list_files(path=video_name + "\\", extensions=['.jpg'], recursive=False)
-        for filename in file_list:
-            output.write(
-                cv2.imread(filename)
-            )
-        output.release()
-        cv2.destroyAllWindows()
-        print("\nVIDEO YAZMA ISLEMI BITTI\n\n")
-
-    def video_capture(self):
-        """self.connect_camera_button_clicked()
-        available_cameras_counter = len(self.available_cameras)
-        
-        file_process = File_Process(video_data_directory_name="video_data_folder")
-        file_process.set_video_extension("avi")
-        path = file_process.get_data_folder_path()
-        extension = file_process.get_video_extension()
-
-        if self.video_capture_mod == False:
-            for i in range(1,available_cameras_counter+1):
-                cam_string = "camera_{}".format(i)
-                video_name = file_process.get_video_name() + cam_string
-                # self.cameras[cam_string].buffer_Clear()
-
-                self.cameras["camera_1"].stream_Start(
-                    trigger_pause=None, 
-                    trigger_quit=None, 
-                    number_of_snapshot=-1, 
-                    delay=0.001, 
-                    trigger_before=None, 
-                    trigger_after=None
-                )
-
-            self.camera_video_capture_button.setText("Stop Video Record")
-            self.video_capture_mod = True
-        else:
-            for i in range(1,available_cameras_counter+1):
-                cam_string = "camera_{}".format(i)
-                self.cameras[cam_string].camera_Releaser()
-
-                self.video_capture_mod = False
-                self.camera_video_capture_button.setText("Start Video Record")
-    """
-
-
-
-
-    def connect_camera_button_clicked(self):
-        self.camera_qtimer_creater_runer()
-        self.camera_status_clear(self.max_camera_numbers)
-        self.autonomous_Camera_Instance()
-        self.camera_set_resolution(width=1920, height=1080)
-        self.autonomous_Camera_Thread_Starter()
-        self.stream_Switch(True)
-        self.camera_status_connected()
-    
-    def remove_camera_button_clicked(self):
-        # self.camera_Remove(), # this button is beta version. it is not working
-        self.camera_status_remove()
-        self.set_statusbar_string("This button is not working.!")
-
-    def configure_Button_Connections(self):
-        self.connect_camera_button.clicked.connect(       
-            self.connect_camera_button_clicked
-        )
-        self.remove_camera_button.clicked.connect(
-            self.remove_camera_button_clicked
-        )
-        self.camera_video_capture_button.clicked.connect(
-            self.image_merge
-            # buraya video kaydetme fonksiyonu eklenecek
-        )
    
     def closeEvent(self, *args, **kwargs):
         super(kiz_UI, self).closeEvent(*args, **kwargs)
