@@ -37,9 +37,11 @@ class Camera_Object_2(Camera_Object):
 
         video_path = "{}{}".format(path, self.name)
 
-        video_name = "{}\\{}.avi".format(video_path, generated_video_name)
+        video_name = "{}{}{}.avi".format(path, generated_video_name, self.name)
+        print("DEBUG: ", video_name)
+
         size = (1920, 1080)
-        fps = 30
+        fps = 13
         fourcc = cv2.VideoWriter_fourcc(*'mp4v') 
 
         output = cv2.VideoWriter(
@@ -116,7 +118,7 @@ class kiz_UI(Structure_UI):
         self.logger = logging.getLogger(self.name)
 
         self.system_o = System_Object()
-        # self.system_o.thread_print_info()
+        self.system_o.thread_print_info()
 
         self.set_widgets()
         self.print_system_info_Thread(trigger_pause=None, trigger_quit=None, number_of_snapshot=-1, delay=0.001, trigger_before=None, trigger_after=None)
