@@ -242,7 +242,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QPushButton" name="connect_camera_button">
+        <widget class="QPushButton" name="camera_connect_button">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
            <horstretch>0</horstretch>
@@ -255,7 +255,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QPushButton" name="remove_camera_button">
+        <widget class="QPushButton" name="camera_remove_button">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
            <horstretch>0</horstretch>
