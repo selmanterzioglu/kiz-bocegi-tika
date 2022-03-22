@@ -1,53 +1,48 @@
-from pickle import FALSE
-import libs
+from multiprocessing import Process, current_process
+import time
 import cv2
-from structure_camera import Camera_Object, CAMERA_FLAGS
+
+import numpy as np
+import cv2 as cv
 
 
-# cam = cv2.VideoCapture(0)
-
-cam =  Camera_Object(
-            camera_flag=CAMERA_FLAGS.CV2,
-            auto_configure=False,
-            trigger_quit=None,
-            trigger_pause=None,
-            lock_until_done=False,
-            acquisition_framerate=30,
-            # exposure_time=exposure_time,
-            # max_buffer_limit=buffer_size,
-            max_buffer_limit=20
-            # logger_level=self.logger_level
-        )
-
-cam.api_CV2_Camera_Create_Instance(2, extra_params = [])
-
-cv2.namedWindow("test")
-
-img_counter = 0
-
-while True:
-    # ret, frame = cam.read()
-    ret, frame = cam.snapshot()
-    if not ret:
-        print("failed to grab frame")
-        break
-    cv2.imshow("test", frame)
-    print(frame.shape)
-
-    k = cv2.waitKey(1)
-    if k%256 == 27:
-        # ESC pressed
-        print("Escape hit, closing...")
-        break
-    elif k%256 == 32:
-        # SPACE pressed
-        img_name = "opencv_frame_{}.png".format(img_counter)
-        cv2.imwrite(img_name, frame)
-        print("{} written!".format(img_name))
-        img_counter += 1
+def video_record(camera_name, cam_src):
+    name = current_process().name
+    print("name", name)
+    cap = cv.VideoCapture(cam_src)
+    # Define the codec and create VideoWriter object
+    fourcc = cv.VideoWriter_fourcc(*'mp4v')
 
 
+    out = cv.VideoWriter(camera_name + ".mp4", fourcc, 20.0, (640,  480))
 
-cv2.destroyAllWindows()
+    cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
+    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
 
+    while cap.isOpened():
+        ret, frame = cap.read()
+        if not ret:
+            print("Can't receive frame (stream end?). Exiting ...")
+            break
+        # write the flipped frame
+        out.write(frame)
+        cv.imshow('frame', frame)
+        if cv.waitKey(1) == ord('q'):
+            break
+    # Release everything if job is finished
+    cap.release()
+    out.release()
+    cv.destroyAllWindows()
+
+
+if __name__ == "__main__":
+    camera_1 = Process(name="camera_1",target=video_record, args=("camera_1",0,))
+    camera_2 = Process(name="camera_2",target=video_record, args=("camera_2",2,))
+
+    camera_1.start()
+    camera_2.start()
+    time.sleep(5)
+    camera_1.join()
+    camera_2.join()
+    
 

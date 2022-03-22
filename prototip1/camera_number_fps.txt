@@ -1,0 +1,4 @@
+1 camera: 29 fps -> delay= 0001
+2 camera: 22 fps -> delay= 0001
+3 camera: None fps -> delay= 0001
+4 camera: None fps -> delay= 0001
