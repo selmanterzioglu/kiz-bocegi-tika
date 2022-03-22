@@ -8,8 +8,8 @@ class RPI_Communication:
         self.output_pin_1 = 3
         self.output_pin_2 = 5
 
-        self.output_pin_1 = 11
-        self.output_pin_2 = 13
+        self.input_pin_1 = 11
+        self.input_pin_2 = 13
 
         self.read_message_dict = dict()
         self.write_message_dict = dict()
