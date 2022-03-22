@@ -1,7 +1,7 @@
 import RPi.GPIO as gpio
 import time
 
-class Raspi_Com:
+class RPI_Communication:
 
     def __init__(self):
         
@@ -11,13 +11,16 @@ class Raspi_Com:
         self.output_pin_1 = 11
         self.output_pin_2 = 13
 
-        self.setup_communication()
-
         self.read_message_dict = dict()
         self.write_message_dict = dict()
 
-        self.read_string = ""
-        self.write_string = ""
+        self.read_message  = ""
+        self.write_message = ""
+
+        self.is_test_mode = False
+
+        self.setup_communication()
+
     
     def setup_read_message_dict(self):
         self.read_message_dict["00"] = "Motors_Stop"
@@ -54,7 +57,19 @@ class Raspi_Com:
     
     def read_arduino(self):
         while True:
-            self.input_pin_1_read = str(gpio.input(self.input_pin_1))
-            self.input_pin_2_read = str(gpio.input(self.input_pin_2))
+            input_pin_1_read = str(gpio.input(self.input_pin_1))
+            input_pin_2_read = str(gpio.input(self.input_pin_2))
+
+            self.read_message = self.read_message_dict[input_pin_1_read + input_pin_2_read]
+
+    def set_test_mode(self, bool):
+        self.is_test_mode = bool
+    
+    def is_test_mode(self):
+        return self.is_test_mode
+        
+
+            
+
 
 
