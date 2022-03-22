@@ -1,3 +1,4 @@
+from ast import Lambda
 from email.mime import image
 import glob
 import libs
@@ -11,13 +12,14 @@ from tools import list_files
 #from structure_ui_camera import Structure_Ui_Camera
 from video_file_process import File_Process
 from structure_threading import Thread_Object
-
+import sys
 
 import gc
 
 class kiz_UI(Structure_UI):
 
     def __init__(self, *args, onj = None, logger_level = logging.INFO, **kwargs):
+        self.init_QTimers = lambda: None
         super(kiz_UI, self).__init__(*args, **kwargs)
 
         self.cameras = dict()
@@ -131,24 +133,41 @@ class kiz_UI(Structure_UI):
             self.cameras[cam_string].quit()
 
         self.remove_camera_variables()
+        
+        self.gui_widgets["camera_video_capture_button"].setText("Start Video Record")
+        self.garbage_Collector_Cleaner()
+        self.set_video_capture_mod(False)
+        # buffer_size = list(self.Buffer_Dict.keys())
+        # print("buffer_keys: ", buffer_size)
+        # print("sys.getsizeof(self.Buffer_Dict)", sys.getsizeof(self.Buffer_Dict))
+        # print("")
+
+    def remove_camera_variables(self):
+        
+        cameras_keys = list(self.cameras.keys())
+        for i in cameras_keys:
+            del self.cameras[i]
+        del cameras_keys
+        
+        q_timers_keys = list(self.q_timers.keys())
+        for i in q_timers_keys:
+            del self.q_timers[i]
+        
+        Buffer_Dict_keys  = list(self.Buffer_Dict.keys())
+        for i in Buffer_Dict_keys:
+            del self.Buffer_Dict[i]
+        
+        
         self.available_cameras = None
         self.available_cameras_counter = 0
 
-        gc.collect(generation=2)
+        # self.Buffer_Dict["qt_function"].clear(is_fast = True)
+        # self.Buffer_Dict["qt_messagebox"].clear(is_fast = True)
+        # self.Buffer_Dict["qt_color_painter"].clear(is_fast = True)
+        # self.Buffer_Dict["qt_object_text"].clear(is_fast = True)
+        # self.Buffer_Dict["qt_file_dialog"].clear(is_fast = True)
+        # self.Buffer_Dict["qt_file_dialog_return"].clear(is_fast = True)
 
-        self.gui_widgets["camera_video_capture_button"].setText("Start Video Record")
-        self.set_video_capture_mod(False)
-        
-    def remove_camera_variables(self):
-        self.cameras = dict()
-        self.q_timers = dict()
-        self.__thread_Dict = dict()
-
-        for i in self.cameras:
-            del i
-
-        for i in self.q_timers:
-            del i
 
     def start_video_record(self):
 
@@ -156,13 +175,16 @@ class kiz_UI(Structure_UI):
         self.autonomous_Camera_Instance()
         self.camera_set_resolution(width=1920, height=1080)
         self.set_video_thread_quit(None)
-
         self.video_record_Thread_Starter()
         self.stream_Switch(True)
         self.set_video_capture_mod(True)
         self.set_camera_status(status="connected") 
-
         self.gui_widgets["camera_video_capture_button"].setText("Stop Video Record")
+        
+        # buffer_size = list(self.Buffer_Dict.keys())
+        # print("buffer_keys: ", buffer_size)
+        # print("sys.getsizeof(self.Buffer_Dict)", sys.getsizeof(self.Buffer_Dict))
+
 
     def configure_Button_Connections(self):
         self.camera_video_capture_button.clicked.connect(
