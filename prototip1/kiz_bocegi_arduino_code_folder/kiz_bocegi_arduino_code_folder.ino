@@ -9,7 +9,7 @@
 // DEVELOPER MODE    //
 ///////////////////////
 
-#define IS_PRINT false
+#define IS_PRINT true
 #define PRINT_DELAY_TIME 100
 
 ///////////////////////
@@ -19,6 +19,13 @@
 // Motor Pins
 #define dirPin 10
 #define stepPin 9
+
+// Communication Pins
+#define input_pin_1 2
+#define input_pin_2 3
+
+#define output_pin_1 4
+#define output_pin_2 5
 
 ////////////////////
 // ENUM VARIABLES //
@@ -51,6 +58,12 @@ enum sensors{
 //////////////////////
 
 typedef struct kiz_bocegi_code_shared{
+
+  int input_pin_1_read; 
+  int input_pin_2_read;
+  
+  int output_pin_1_read; 
+  int output_pin_2_read;
 
   int motor_front_left_speed;
   int motor_front_right_speed;
@@ -89,11 +102,21 @@ void set_default_sensors_parameters(){
   g_shared.a2 = 0;
 }
 
+void communication_pins_configuration(){
+  pinMode(input_pin_1, INPUT);
+  pinMode(input_pin_2, INPUT);
+
+  pinMode(output_pin_1, OUTPUT);
+  pinMode(output_pin_2, OUTPUT);
+
+}
+
 void setup() {
 
   set_default_sensors_parameters();
   distance_sensors_configurations();
-
+  communication_pins_configuration();
+  
   #if IS_PRINT
     Serial.begin(9600);
     delay(1000);
@@ -214,7 +237,8 @@ void print_info_all(){
     #if IS_PRINT
       print_info(PRINT_MOTORS);
       print_info(PRINT_RPI);
-      print_info(PRINT_DISTANCE_SENSORS);
+      print_info(PRINT_DISTANCE_SENSORS_FRONT);
+      print_info(PRINT_DISTANCE_SENSORS_BACKEND);
     #endif
 }
 
@@ -243,7 +267,15 @@ void set_pin_distance(sensors flag){
 }
 
 void loop() {
-  scenario();
+  digitalWrite(output_pin_1, HIGH);
+  digitalWrite(output_pin_2, LOW);
+
+  int input_pin_1_read = digitalRead(input_pin_1); // Reading status of Arduino digital Pin
+  int input_pin_2_read = digitalRead(input_pin_2); // Reading status of Arduino digital Pin
+
+  
+  Serial.println("pin_1_read: " + String(input_pin_1_read) + "  pin_2_read: " + String(input_pin_2_read));
+
 }
 
 void scenario(){
