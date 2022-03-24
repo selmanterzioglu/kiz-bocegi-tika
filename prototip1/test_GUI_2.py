@@ -1,7 +1,9 @@
+from ast import Lambda
 from email.mime import image
 import glob
 import libs
 import logging
+from raspi_communication import RPI_Communication
 from structure_ui import Structure_UI, Graphics_View
 from structure_camera import Camera_Object, CAMERA_FLAGS
 from structure_system import System_Object
@@ -11,7 +13,9 @@ from tools import list_files
 #from structure_ui_camera import Structure_Ui_Camera
 from video_file_process import File_Process
 from structure_threading import Thread_Object
+import sys
 
+import gc
 
 class kiz_UI(Structure_UI):
 
@@ -48,6 +52,31 @@ class kiz_UI(Structure_UI):
         self.set_widgets()
         self.print_system_info_Thread(trigger_pause=None, trigger_quit=None, number_of_snapshot=-1, delay=0.001, trigger_before=None, trigger_after=None)
 
+        self.test = RPI_Communication(test_mode=True)
+        self.test.input_pin_1_read = "0"
+        self.test.input_pin_2_read = "1"
+        self.read_arduino_Thread()
+
+    def read_arduino_Thread(self):
+
+        if self.get_Is_Object_Initialized():
+            self.__thread_Dict["read_arduino_Thread"] = Thread_Object(
+                name="Camera_Object.read_arduino_Thread",
+                delay=0.0001,
+                logger_level=self.logger.getEffectiveLevel(),
+                set_Deamon=True,
+                run_number=None,
+                quit_trigger=None
+            )
+            self.__thread_Dict["read_arduino_Thread"].init(
+                task=self.test.read_arduino
+            )
+            self.__thread_Dict["read_arduino_Thread"].start()
+
+            return self.__thread_Dict["read_arduino_Thread"]
+        else:
+            return None
+  
     def print_system_info_Thread(self, trigger_pause=None, trigger_quit=None, number_of_snapshot=-1, delay=0.001, trigger_before=None, trigger_after=None):
 
         if self.get_Is_Object_Initialized():
@@ -83,8 +112,8 @@ class kiz_UI(Structure_UI):
         self.gui_widgets["cam_4_status_label"] = self.cam_4_status_label
 
         self.gui_widgets["camera_video_capture_button"] = self.camera_video_capture_button
-        self.gui_widgets["connect_camera_button"] = self.connect_camera_button
-        self.gui_widgets["remove_camera_button"] = self.remove_camera_button
+        self.gui_widgets["camera_connect_button"] = self.camera_connect_button
+        self.gui_widgets["camera_remove_button"] = self.camera_remove_button
 
         self.gui_widgets["label_used_cpu"] = self.label_used_cpu
         self.gui_widgets["label_used_memory"] = self.label_used_memory
@@ -105,7 +134,7 @@ class kiz_UI(Structure_UI):
             self.available_cameras_counter = len(self.available_cameras)
             self.start_video_record()
 
-    def connect_camera_button_clicked(self):
+    def camera_connect_button_clicked(self):
         self.available_cameras = self.get_camera_available_port()
         self.available_cameras_counter = len(self.available_cameras)
 
@@ -117,23 +146,54 @@ class kiz_UI(Structure_UI):
         self.stream_Switch(True)
         self.set_camera_status(status="connected")
     
-    def remove_camera_button_clicked(self):
+    def camera_remove_button_clicked(self):
         # self.camera_Remove(), # this button is beta version. it is not working
         self.set_statusbar_string("This button is not working.!")
 
     def stop_video_record(self):
-        # self.stream_Switch(False)
         self.set_video_thread_quit(True)
-        # for i in range(1,self.available_cameras_counter + 1):
-        #     cam_string = "camera_{}".format(i)
-        #     self.cameras[cam_string].image_merge_Thread(
-        #         trigger_pause=None,
-        #         trigger_quit= None,
-        #         delay=0.001,
-        #         trigger_before=None, 
-        #         trigger_after=None,
-        #     )
+        qt_tools.qtimer_All_Stop(self.q_timers)
+
+        for i in range(1,self.available_cameras_counter + 1):
+            cam_string = "camera_{}".format(i)
+            self.cameras[cam_string].quit()
+
+        self.remove_camera_variables()
+        
         self.gui_widgets["camera_video_capture_button"].setText("Start Video Record")
+        self.garbage_Collector_Cleaner()
+        self.set_video_capture_mod(False)
+        # buffer_size = list(self.Buffer_Dict.keys())
+        # print("buffer_keys: ", buffer_size)
+        # print("sys.getsizeof(self.Buffer_Dict)", sys.getsizeof(self.Buffer_Dict))
+        # print("")
+
+    def remove_camera_variables(self):
+        
+        cameras_keys = list(self.cameras.keys())
+        for i in cameras_keys:
+            del self.cameras[i]
+        del cameras_keys
+        
+        q_timers_keys = list(self.q_timers.keys())
+        for i in q_timers_keys:
+            del self.q_timers[i]
+        
+        Buffer_Dict_keys  = list(self.Buffer_Dict.keys())
+        for i in Buffer_Dict_keys:
+            del self.Buffer_Dict[i]
+        
+        
+        self.available_cameras = None
+        self.available_cameras_counter = 0
+
+        # self.Buffer_Dict["qt_function"].clear(is_fast = True)
+        # self.Buffer_Dict["qt_messagebox"].clear(is_fast = True)
+        # self.Buffer_Dict["qt_color_painter"].clear(is_fast = True)
+        # self.Buffer_Dict["qt_object_text"].clear(is_fast = True)
+        # self.Buffer_Dict["qt_file_dialog"].clear(is_fast = True)
+        # self.Buffer_Dict["qt_file_dialog_return"].clear(is_fast = True)
+
 
     def start_video_record(self):
 
@@ -141,23 +201,26 @@ class kiz_UI(Structure_UI):
         self.autonomous_Camera_Instance()
         self.camera_set_resolution(width=1920, height=1080)
         self.set_video_thread_quit(None)
-
         self.video_record_Thread_Starter()
         self.stream_Switch(True)
         self.set_video_capture_mod(True)
-        self.set_camera_status(status="connected")
-        
+        self.set_camera_status(status="connected") 
         self.gui_widgets["camera_video_capture_button"].setText("Stop Video Record")
+        
+        # buffer_size = list(self.Buffer_Dict.keys())
+        # print("buffer_keys: ", buffer_size)
+        # print("sys.getsizeof(self.Buffer_Dict)", sys.getsizeof(self.Buffer_Dict))
+
 
     def configure_Button_Connections(self):
         self.camera_video_capture_button.clicked.connect(
             self.camera_video_capture_button_clicked
         )
-        self.connect_camera_button.clicked.connect(       
-            self.connect_camera_button_clicked
+        self.camera_remove_button.clicked.connect(       
+            self.camera_connect_button_clicked
         )
-        self.remove_camera_button.clicked.connect(
-            self.remove_camera_button_clicked
+        self.camera_remove_button.clicked.connect(
+            self.camera_remove_button_clicked
         )
    
     def set_video_capture_mod(self, bool):
@@ -174,7 +237,7 @@ class kiz_UI(Structure_UI):
                 self.q_timers["camera_1_renderer"] = qt_tools.qtimer_Create_And_Run(
                     self,
                     connection=self.camera_1_renderer,
-                    delay=10,
+                    delay=2,
                     is_needed_start=True,
                     is_single_shot=False
                 )   
@@ -182,7 +245,7 @@ class kiz_UI(Structure_UI):
                 self.q_timers["camera_2_renderer"] = qt_tools.qtimer_Create_And_Run(
                     self,
                     connection=self.camera_2_renderer,
-                    delay=10,
+                    delay=2,
                     is_needed_start=True,
                     is_single_shot=False
                 )
@@ -190,7 +253,7 @@ class kiz_UI(Structure_UI):
                 self.q_timers["camera_3_renderer"] = qt_tools.qtimer_Create_And_Run(
                     self,
                     connection=self.camera_3_renderer,
-                    delay=10,
+                    delay=2,
                     is_needed_start=True,
                     is_single_shot=False
                 )
@@ -198,7 +261,7 @@ class kiz_UI(Structure_UI):
                 self.q_timers["camera_4_renderer"] = qt_tools.qtimer_Create_And_Run(
                     self,
                     connection=self.camera_4_renderer,
-                    delay=10,
+                    delay=2,
                     is_needed_start=True,
                     is_single_shot=False
                 )
@@ -248,7 +311,7 @@ class kiz_UI(Structure_UI):
         for i in range(1,self.available_cameras_counter+1):
             cam_string = "camera_{}".format(i)
             self.camera_Initializes(camera_number=i)
-            self.cameras[cam_string].api_CV2_Camera_Create_Instance(self.available_cameras[counter], extra_params = []),
+            self.cameras[cam_string].api_CV2_Camera_Create_Instance(self.available_cameras[counter], extra_params = [])
             counter +=1
 
     def set_camera_status(self, status):
@@ -270,6 +333,11 @@ class kiz_UI(Structure_UI):
         file_process = File_Process(video_data_directory_name="video_data_folder")
         path = file_process.get_data_folder_path()
         generated_video_name = file_process.get_video_name()
+        
+        if self.available_cameras_counter == 1:
+            fps = 29
+        elif self.available_cameras_counter == 2:
+            fps = 22
 
         for i in range(1,self.available_cameras_counter + 1):
             cam_string = "camera_{}".format(i)
@@ -284,7 +352,7 @@ class kiz_UI(Structure_UI):
                 trigger_before=None,
                 trigger_after=None,
                 save_path=video_name, 
-                fps=29
+                fps=fps
             )
     
     def is_video_thread_quit(self):
@@ -315,8 +383,8 @@ class kiz_UI(Structure_UI):
     
     def camera_set_resolution(self, width, height):
         for i in range(1,self.available_cameras_counter+1):
-                cam_string = "camera_{}".format(i)
-                self.cameras[cam_string].cv2_Set_Camera_Size((width,height))
+            cam_string = "camera_{}".format(i)
+            self.cameras[cam_string].cv2_Set_Camera_Size((width,height))
    
     def closeEvent(self, *args, **kwargs):
         super(kiz_UI, self).closeEvent(*args, **kwargs)

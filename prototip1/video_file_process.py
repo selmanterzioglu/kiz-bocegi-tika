@@ -31,7 +31,7 @@ class File_Process():
 
 
     def update_data_folder_path(self):
-        self.data_folder_path = self.get_path_os() + "\\" +  self.video_data_directory_name + "\\" 
+        self.data_folder_path = self.get_path_os() + "/" +  self.video_data_directory_name + "/" 
     
     def create_data_folder(self):
         self.make_directory(self.video_data_directory_name)
@@ -75,4 +75,4 @@ class File_Process():
 
 if __name__ == "__main__":
     a = File_Process(video_data_directory_name="video_data_folder")
-    print(a.get_video_name())
+    print(a.data_folder_path)
