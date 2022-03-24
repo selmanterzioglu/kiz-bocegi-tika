@@ -27,7 +27,7 @@ class RPI_Communication():
         self.input_pin_2 = 13
 
         self.read_message_dict = dict()
-        self.write_message_dict = dict()
+        self.write_message_dict = dict()    
         self.__thread_Dict = dict()
 
         self.read_message  = ""

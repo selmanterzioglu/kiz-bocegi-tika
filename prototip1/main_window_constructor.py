@@ -3,6 +3,7 @@ from email.mime import image
 import glob
 import libs
 import logging
+from raspi_communication import RPI_Communication
 from structure_ui import Structure_UI, Graphics_View
 from structure_camera import Camera_Object, CAMERA_FLAGS
 from structure_system import System_Object
@@ -51,6 +52,31 @@ class kiz_UI(Structure_UI):
         self.set_widgets()
         self.print_system_info_Thread(trigger_pause=None, trigger_quit=None, number_of_snapshot=-1, delay=0.001, trigger_before=None, trigger_after=None)
 
+        # self.test = RPI_Communication(test_mode=True)
+        # self.test.input_pin_1_read = "0"
+        # self.test.input_pin_2_read = "1"
+        # self.read_arduino_Thread()
+
+    def read_arduino_Thread(self):
+
+        if self.get_Is_Object_Initialized():
+            self.__thread_Dict["read_arduino_Thread"] = Thread_Object(
+                name="Camera_Object.read_arduino_Thread",
+                delay=0.0001,
+                logger_level=self.logger.getEffectiveLevel(),
+                set_Deamon=True,
+                run_number=None,
+                quit_trigger=None
+            )
+            self.__thread_Dict["read_arduino_Thread"].init(
+                task=self.test.read_arduino
+            )
+            self.__thread_Dict["read_arduino_Thread"].start()
+
+            return self.__thread_Dict["read_arduino_Thread"]
+        else:
+            return None
+  
     def print_system_info_Thread(self, trigger_pause=None, trigger_quit=None, number_of_snapshot=-1, delay=0.001, trigger_before=None, trigger_after=None):
 
         if self.get_Is_Object_Initialized():
@@ -372,7 +398,7 @@ class kiz_UI(Structure_UI):
         
         while source >=0:
             try:
-                camera = cv2.VideoCapture(source, cv2.CAP_DSHOW)
+                camera = cv2.VideoCapture(source)
                 is_reading, img = camera.read()
                 if camera.isOpened() and is_reading is True:
                     available_port.append(source)  
