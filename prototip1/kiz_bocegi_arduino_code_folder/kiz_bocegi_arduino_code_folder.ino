@@ -131,7 +131,7 @@ void motors_status(motors flag){
   {
   case MOTORS_FORWARD:
     digitalWrite(dirPin, LOW);
-    for (int i = 0;; i++) {
+    for (;;) {
       digitalWrite(stepPin, HIGH);
       delayMicroseconds(3000);
       digitalWrite(stepPin, LOW);
@@ -267,15 +267,16 @@ void set_pin_distance(sensors flag){
 }
 
 void loop() {
-  digitalWrite(output_pin_1, HIGH);
-  digitalWrite(output_pin_2, LOW);
 
-  int input_pin_1_read = digitalRead(input_pin_1); // Reading status of Arduino digital Pin
-  int input_pin_2_read = digitalRead(input_pin_2); // Reading status of Arduino digital Pin
+  digitalWrite(dirPin, HIGH);
+  for (;;) {
+    digitalWrite(stepPin, HIGH);
+    delayMicroseconds(3000);
+    digitalWrite(stepPin, LOW);
+    delayMicroseconds(3000);
 
+  }
   
-  Serial.println("pin_1_read: " + String(input_pin_1_read) + "  pin_2_read: " + String(input_pin_2_read));
-
 }
 
 void scenario(){
