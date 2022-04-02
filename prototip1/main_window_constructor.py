@@ -82,7 +82,7 @@ class kiz_UI(Structure_UI):
         if self.get_Is_Object_Initialized():
             self.__thread_Dict["print_system_info_Thread"] = Thread_Object(
                 name="Camera_Object.print_system_info_Thread",
-                delay=0.0001,
+                delay=0.001,
                 logger_level=self.logger.getEffectiveLevel(),
                 set_Deamon=True,
                 run_number=None,
@@ -142,7 +142,7 @@ class kiz_UI(Structure_UI):
 
         self.autonomous_Camera_Instance()
         self.camera_set_resolution(width=1920, height=1080)
-        self.autonomous_Camera_Thread_Starter(is_record=None)
+        self.autonomous_Camera_Thread_Starter()
         self.stream_Switch(True)
         self.set_camera_status(status="connected")
     
@@ -334,9 +334,14 @@ class kiz_UI(Structure_UI):
         path = file_process.get_data_folder_path()
         generated_video_name = file_process.get_video_name()
         
+        fps = 30
         if self.available_cameras_counter == 1:
             fps = 29
         elif self.available_cameras_counter == 2:
+            fps = 22
+        elif self.available_cameras_counter == 3:
+            fps = 15
+        elif self.available_cameras_counter == 4:
             fps = 22
 
         for i in range(1,self.available_cameras_counter + 1):
@@ -361,21 +366,18 @@ class kiz_UI(Structure_UI):
     def set_video_thread_quit(self, video_thread_quit):
         self.video_thread_quit = video_thread_quit
 
-    def autonomous_Camera_Thread_Starter(self, is_record = None):
+    def autonomous_Camera_Thread_Starter(self):
         """This function start camera thread functions"""
         for i in range(1,self.available_cameras_counter + 1):
             cam_string = "camera_{}".format(i)
 
-            if is_record is not None:
-                is_record = self.cameras[cam_string].image_write
-            
             self.cameras[cam_string].stream_Start_Thread(
                 trigger_pause=self.is_Stream_Active,
                 trigger_quit= None,
                 number_of_snapshot=-1,
                 delay=0.001,
                 trigger_before=None, 
-                trigger_after=is_record,
+                trigger_after=None,
             )
             
     def set_statusbar_string(self, message):
