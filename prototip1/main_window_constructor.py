@@ -138,7 +138,7 @@ class kiz_UI(Structure_UI):
         self.available_cameras = self.get_camera_available_port()
         self.available_cameras_counter = len(self.available_cameras)
 
-        self.camera_qtimer_creater_runer()
+        self.camera_qtimer_creater_runner()
 
         self.autonomous_Camera_Instance()
         self.camera_set_resolution(width=1920, height=1080)
@@ -197,7 +197,7 @@ class kiz_UI(Structure_UI):
 
     def start_video_record(self):
 
-        self.camera_qtimer_creater_runer()
+        self.camera_qtimer_creater_runner()
         self.autonomous_Camera_Instance()
         self.camera_set_resolution(width=1920, height=1080)
         self.set_video_thread_quit(None)
@@ -229,7 +229,7 @@ class kiz_UI(Structure_UI):
     def is_video_capture_mod(self):
         return self.video_capture_mod
 
-    def camera_qtimer_creater_runer(self):
+    def camera_qtimer_creater_runner(self):
         if self.available_cameras_counter == 0:
             print("your camera/s is not available")
         else:    
@@ -272,7 +272,9 @@ class kiz_UI(Structure_UI):
             self.cameras[camera_string] = Camera_Object(
                 camera_flag=CAMERA_FLAGS.CV2,
                 logger_level=logging.INFO,
-                auto_configure=False,
+                auto_configure=True,
+                extra_params=[],
+                # auto_configure=False,
                 trigger_quit=None,
                 trigger_pause=None,
                 lock_until_done=False,
@@ -310,20 +312,23 @@ class kiz_UI(Structure_UI):
         counter=0
         for i in range(1,self.available_cameras_counter+1):
             cam_string = "camera_{}".format(i)
+            self.qt_Priority()
             self.camera_Initializes(camera_number=i)
-            self.cameras[cam_string].api_CV2_Camera_Create_Instance(self.available_cameras[counter], extra_params = [])
+            # self.cameras[cam_string].api_CV2_Camera_Create_Instance(self.available_cameras[counter], extra_params = [])
             counter +=1
 
     def set_camera_status(self, status):
 
         if status == "default":
             for i in range(1,5):
+                self.qt_Priority()
                 label_string = "cam_{}_status_label".format(i)
                 message = "Cam {} Status:".format(i)
                 self.gui_widgets[label_string].setText(message)
         
         elif status== "connected":
             for i in range(1,self.available_cameras_counter + 1):
+                self.qt_Priority()
                 label_string = "cam_{}_status_label".format(i)
                 message = "Cam {} Status: ENABLED".format(i)
                 self.gui_widgets[label_string].setText(message)
@@ -340,6 +345,7 @@ class kiz_UI(Structure_UI):
             fps = 22
 
         for i in range(1,self.available_cameras_counter + 1):
+            self.qt_Priority()
             cam_string = "camera_{}".format(i)
             video_path = "{}{}".format(path, self.cameras[cam_string].name)
             video_name = "{}{}{}.avi".format(path, generated_video_name, cam_string)
@@ -364,6 +370,7 @@ class kiz_UI(Structure_UI):
     def autonomous_Camera_Thread_Starter(self, is_record = None):
         """This function start camera thread functions"""
         for i in range(1,self.available_cameras_counter + 1):
+            self.qt_Priority()
             cam_string = "camera_{}".format(i)
 
             if is_record is not None:
@@ -383,6 +390,7 @@ class kiz_UI(Structure_UI):
     
     def camera_set_resolution(self, width, height):
         for i in range(1,self.available_cameras_counter+1):
+            self.qt_Priority()
             cam_string = "camera_{}".format(i)
             self.cameras[cam_string].cv2_Set_Camera_Size((width,height))
    
