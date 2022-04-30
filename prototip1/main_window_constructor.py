@@ -314,7 +314,7 @@ class kiz_UI(Structure_UI):
             cam_string = "camera_{}".format(i)
             self.qt_Priority()
             self.camera_Initializes(camera_number=i)
-            # self.cameras[cam_string].api_CV2_Camera_Create_Instance(self.available_cameras[counter], extra_params = [])
+            self.cameras[cam_string].api_CV2_Camera_Create_Instance(self.available_cameras[counter], extra_params = [cv2.CAP_V4L2])
             counter +=1
 
     def set_camera_status(self, status):
