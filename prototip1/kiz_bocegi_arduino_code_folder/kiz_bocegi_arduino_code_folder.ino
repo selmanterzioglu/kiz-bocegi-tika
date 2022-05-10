@@ -41,6 +41,7 @@ enum motors {
   MOTORS_RESET
 };
 
+
 enum print_flags{
   PRINT_MOTORS,
   PRINT_RPI,
@@ -83,6 +84,11 @@ typedef struct kiz_bocegi_code_shared{
   int echoPinArka = 6;  //  >  Arka sensor
   long sureArka;        //
   long uzaklikArka;     //
+
+  int stop_distance_backend_sensor;
+  int stop_distance_frontend_sensor;
+
+
 
 } kiz_bocegi;
 
@@ -223,7 +229,7 @@ void print_info(print_flags flag){
     case PRINT_DISTANCE_SENSORS_BACKEND:
       Serial.print("Uzaklik Arka "); 
       Serial.print(g_shared.uzaklikArka);   //Olctugumuz uzakligi seri port ekranina yazdiriyoruz
-      Serial.print(" cm *** \n");
+      Serial.println(" cm *** \n");
       break;
       
   }
@@ -266,22 +272,31 @@ void set_pin_distance(sensors flag){
 
 }
 
-void loop() {
-
+void test_code_go_without_sensors(){
   digitalWrite(dirPin, HIGH);
   for (;;) {
     digitalWrite(stepPin, HIGH);
     delayMicroseconds(3000);
     digitalWrite(stepPin, LOW);
     delayMicroseconds(3000);
-
   }
-  
 }
+void loop() {
+  
+  //test_code_go_without_sensors();
+  
+  scenario();
+}
+
+void set_sensor_stop_distance(int sensor_frontend, int sensor_backend){
+  g_shared.stop_distance_backend_sensor = sensor_backend;
+  g_shared.stop_distance_frontend_sensor = sensor_frontend;
+}
+
 
 void scenario(){
   //  below lines are functions which calculate distance using distance_sensors and print info to serial monitor.
-
+  
   get_distance_sensors_frontEnd();
   set_pin_distance(DISTANCE_SENSORS_FRONT);
 
@@ -291,22 +306,21 @@ void scenario(){
   set_pin_distance(DISTANCE_SENSORS_BACKEND);
 
   print_info(PRINT_DISTANCE_SENSORS_BACKEND);
-
   
-  if(((g_shared.uzaklikOn > 0)&&(g_shared.uzaklikOn <= 5))&&((g_shared.uzaklikArka == 0)||(g_shared.uzaklikArka > 5))){
-    motors_status(MOTORS_BACKWARD);
-  }
-  else if(((g_shared.uzaklikArka > 0)&&(g_shared.uzaklikArka <= 5))&&((g_shared.uzaklikOn == 0)||(g_shared.uzaklikOn > 5))){
-    motors_status(MOTORS_FORWARD);
-  }
-  // deleted 'else' code line here. because it was an unnecessary.
+  // if(((g_shared.uzaklikOn > 0)&&(g_shared.uzaklikOn <= 5))&&((g_shared.uzaklikArka == 0)||(g_shared.uzaklikArka > 5))){
+  //   motors_status(MOTORS_BACKWARD);
+  // }
+  // else if(((g_shared.uzaklikArka > 0)&&(g_shared.uzaklikArka <= 5))&&((g_shared.uzaklikOn == 0)||(g_shared.uzaklikOn > 5))){
+  //   motors_status(MOTORS_FORWARD);
+  // }
+  // // deleted 'else' code line here. because it was an unnecessary.
   
 
-  if(g_shared.a1 > 0){
-    motors_status(MOTORS_BACKWARD);
-  }
-  else if(g_shared.a2 > 0){
-    motors_status(MOTORS_FORWARD);
-  }
+  // if(g_shared.a1 > 0){
+  //   motors_status(MOTORS_BACKWARD);
+  // }
+  // else if(g_shared.a2 > 0){
+  //   motors_status(MOTORS_FORWARD);
+  // }
   
 }
