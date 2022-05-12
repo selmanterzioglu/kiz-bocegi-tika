@@ -1,21 +1,20 @@
-from ast import Lambda
-from email.mime import image
 import glob
 import libs
 import logging
 from raspi_communication import RPI_Communication
+from specialFunciton import specialFunction
 from structure_ui import Structure_UI, Graphics_View
 from structure_camera import Camera_Object, CAMERA_FLAGS
 from structure_system import System_Object
 import cv2
 import qt_tools
 from tools import list_files
-#from structure_ui_camera import Structure_Ui_Camera
+
 from video_file_process import File_Process
 from structure_threading import Thread_Object
 import sys
-
-import gc
+import test_communication
+from specialFunciton import specialFunction
 
 class kiz_UI(Structure_UI):
 
@@ -39,7 +38,14 @@ class kiz_UI(Structure_UI):
         self.video_directory = "video_data_folder/"
         self.is_Object_Initialized = True
         self.video_thread_quit = None
+        
+        self.arduino_serial = test_communication.Arduino_communication()
+        self.arduino_serial_recieve_data = None
+        self.arduino_frontend_distance = None
+        self.arduino_backend_distance = None
 
+        self.specialFunction = specialFunction()
+        
         self.init()
     
     def init(self):
@@ -47,17 +53,13 @@ class kiz_UI(Structure_UI):
         self.logger = logging.getLogger(self.name)
 
         self.system_o = System_Object()
-        self.system_o.thread_print_info()
+        # self.system_o.thread_print_info()
 
         self.set_widgets()
         self.print_system_info_Thread(trigger_pause=None, trigger_quit=None, number_of_snapshot=-1, delay=0.001, trigger_before=None, trigger_after=None)
+        self.read_arduino_Thread(trigger_pause=None, trigger_quit=None, number_of_snapshot=-1, delay=0.001, trigger_before=None, trigger_after=None)
 
-        # self.test = RPI_Communication(test_mode=True)
-        # self.test.input_pin_1_read = "0"
-        # self.test.input_pin_2_read = "1"
-        # self.read_arduino_Thread()
-
-    def read_arduino_Thread(self):
+    def read_arduino_Thread(self, trigger_pause=None, trigger_quit=None, number_of_snapshot=-1, delay=0.001, trigger_before=None, trigger_after=None):
 
         if self.get_Is_Object_Initialized():
             self.__thread_Dict["read_arduino_Thread"] = Thread_Object(
@@ -69,14 +71,38 @@ class kiz_UI(Structure_UI):
                 quit_trigger=None
             )
             self.__thread_Dict["read_arduino_Thread"].init(
-                task=self.test.read_arduino
+                params = [
+                    trigger_pause,
+                    trigger_quit,
+                    number_of_snapshot,
+                    delay,
+                    trigger_before, 
+                    trigger_after
+                ],
+                task=self.read_arduino
             )
             self.__thread_Dict["read_arduino_Thread"].start()
 
             return self.__thread_Dict["read_arduino_Thread"]
         else:
             return None
-  
+    
+    def read_arduino(self, trigger_pause=None, trigger_quit=None, number_of_snapshot=-1, delay=0.001, trigger_before=None, trigger_after=None):
+        if (self.arduino_serial_recieve_data == None):
+            self.arduino_frontend_distance = "[WARNING]: Arduino port is not available.!"
+            self.arduino_backend_distance = "[WARNING]: Arduino port is not available.!"
+
+        else:
+            self.arduino_serial_recieve_data = self.arduino_serial.read_data_from_arduino()
+            
+            if (self.arduino_serial_recieve_data.find("Uzaklik On: ") != -1):
+                self.arduino_frontend_distance = self.arduino_serial_recieve_data.strip("Uzaklik On: ")
+            elif (self.arduino_serial_recieve_data.find("Uzaklik Arka: ") != -1):
+                self.arduino_backend_distance = self.arduino_serial_recieve_data.strip("Uzaklik Arka: ")
+
+            self.gui_widgets["label_frontend_distance"].setText("Frontend Distance: {} cm".format(self.arduino_frontend_distance))
+            self.gui_widgets["label_backend_distance"].setText("Backend Distance: {} cm".format(self.arduino_backend_distance))
+
     def print_system_info_Thread(self, trigger_pause=None, trigger_quit=None, number_of_snapshot=-1, delay=0.001, trigger_before=None, trigger_after=None):
 
         if self.get_Is_Object_Initialized():
@@ -111,12 +137,14 @@ class kiz_UI(Structure_UI):
         self.gui_widgets["cam_3_status_label"] = self.cam_3_status_label
         self.gui_widgets["cam_4_status_label"] = self.cam_4_status_label
 
-        self.gui_widgets["camera_video_capture_button"] = self.camera_video_capture_button
-        self.gui_widgets["camera_connect_button"] = self.camera_connect_button
-        self.gui_widgets["camera_remove_button"] = self.camera_remove_button
+        self.gui_widgets["button_camera_video_capture"] = self.button_camera_video_capture
+        self.gui_widgets["button_camera_connect"] = self.button_camera_connect
+        self.gui_widgets["button_camera_remove"] = self.button_camera_remove
 
         self.gui_widgets["label_used_cpu"] = self.label_used_cpu
         self.gui_widgets["label_used_memory"] = self.label_used_memory
+        self.gui_widgets["label_frontend_distance"] = self.label_frontend_distance
+        self.gui_widgets["label_backend_distance"] = self.label_backend_distance
 
     def init_gui_thread(self, trigger_pause=None, trigger_quit=None, number_of_snapshot=-1, delay=0.001, trigger_before=None, trigger_after=None):
         cpu_percent = "Used CPU: {}".format(self.system_o.cpu_percent_Psutil())        
@@ -163,11 +191,7 @@ class kiz_UI(Structure_UI):
         self.gui_widgets["camera_video_capture_button"].setText("Start Video Record")
         self.garbage_Collector_Cleaner()
         self.set_video_capture_mod(False)
-        # buffer_size = list(self.Buffer_Dict.keys())
-        # print("buffer_keys: ", buffer_size)
-        # print("sys.getsizeof(self.Buffer_Dict)", sys.getsizeof(self.Buffer_Dict))
-        # print("")
-
+       
     def remove_camera_variables(self):
         
         cameras_keys = list(self.cameras.keys())
@@ -187,14 +211,6 @@ class kiz_UI(Structure_UI):
         self.available_cameras = None
         self.available_cameras_counter = 0
 
-        # self.Buffer_Dict["qt_function"].clear(is_fast = True)
-        # self.Buffer_Dict["qt_messagebox"].clear(is_fast = True)
-        # self.Buffer_Dict["qt_color_painter"].clear(is_fast = True)
-        # self.Buffer_Dict["qt_object_text"].clear(is_fast = True)
-        # self.Buffer_Dict["qt_file_dialog"].clear(is_fast = True)
-        # self.Buffer_Dict["qt_file_dialog_return"].clear(is_fast = True)
-
-
     def start_video_record(self):
 
         self.camera_qtimer_creater_runner()
@@ -207,11 +223,6 @@ class kiz_UI(Structure_UI):
         self.set_camera_status(status="connected") 
         self.gui_widgets["camera_video_capture_button"].setText("Stop Video Record")
         
-        # buffer_size = list(self.Buffer_Dict.keys())
-        # print("buffer_keys: ", buffer_size)
-        # print("sys.getsizeof(self.Buffer_Dict)", sys.getsizeof(self.Buffer_Dict))
-
-
     def configure_Button_Connections(self):
         self.camera_video_capture_button.clicked.connect(
             self.camera_video_capture_button_clicked
@@ -314,7 +325,11 @@ class kiz_UI(Structure_UI):
             cam_string = "camera_{}".format(i)
             self.qt_Priority()
             self.camera_Initializes(camera_number=i)
-            self.cameras[cam_string].api_CV2_Camera_Create_Instance(self.available_cameras[counter], extra_params = [cv2.CAP_V4L2])
+            # if (self.specialFunction.get_os_platform == "win32"):
+            #     self.cameras[cam_string].api_CV2_Camera_Create_Instance(self.available_cameras[counter], extra_params = [cv2.CAP_V4L2])
+            if (self.specialFunction.get_os_platform() == "linux" or self.specialFunction.get_os_platform() == "linux2"):
+                self.cameras[cam_string].api_CV2_Camera_Create_Instance(self.available_cameras[counter], extra_params = [cv2.CAP_V4L2])
+
             counter +=1
 
     def set_camera_status(self, status):
