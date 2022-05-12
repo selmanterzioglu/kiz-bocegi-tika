@@ -29,14 +29,14 @@ class Arduino_communication():
         return port,arduino
 
     def read_data_from_arduino(self):
-        return self.arduino.readline()
+        read_data = None
+        try:
+            read_data = self.arduino.readline().decode().strip("\n")
+        except UnicodeDecodeError:
+            pass    
+        
+        return read_data
 
     def send_data_to_arduino(self, sended_data):
-        self.arduino.write(bytes(sended_data, 'utf-8'))
+        self.arduino.write(sended_data.encode())
         time.sleep(0.05)
-
-a = Arduino_communication()
-a.send_data_to_arduino("1")
-
-print(a.read_data_from_arduino())
-

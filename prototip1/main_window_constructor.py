@@ -88,20 +88,23 @@ class kiz_UI(Structure_UI):
             return None
     
     def read_arduino(self, trigger_pause=None, trigger_quit=None, number_of_snapshot=-1, delay=0.001, trigger_before=None, trigger_after=None):
-        if (self.arduino_serial_recieve_data == None):
-            self.arduino_frontend_distance = "[WARNING]: Arduino port is not available.!"
-            self.arduino_backend_distance = "[WARNING]: Arduino port is not available.!"
 
-        else:
+        if (self.arduino_serial.arduino is not None):
             self.arduino_serial_recieve_data = self.arduino_serial.read_data_from_arduino()
-            
+
             if (self.arduino_serial_recieve_data.find("Uzaklik On: ") != -1):
                 self.arduino_frontend_distance = self.arduino_serial_recieve_data.strip("Uzaklik On: ")
+                self.gui_widgets["label_frontend_distance"].setText("Frontend Distance: {} cm".format(self.arduino_frontend_distance))
+
             elif (self.arduino_serial_recieve_data.find("Uzaklik Arka: ") != -1):
                 self.arduino_backend_distance = self.arduino_serial_recieve_data.strip("Uzaklik Arka: ")
-
-            self.gui_widgets["label_frontend_distance"].setText("Frontend Distance: {} cm".format(self.arduino_frontend_distance))
-            self.gui_widgets["label_backend_distance"].setText("Backend Distance: {} cm".format(self.arduino_backend_distance))
+                self.gui_widgets["label_backend_distance"].setText("Backend Distance: {} cm".format(self.arduino_backend_distance))
+        else:
+            self.arduino_frontend_distance = -1
+            self.arduino_backend_distance = -1
+            self.gui_widgets["label_frontend_distance"].setText("Frontend Sensor is not found")
+            self.gui_widgets["label_backend_distance"].setText("Backend Sensor is not found")
+            self.set_statusbar_string("Sensor error! Sensors are not available.!")
 
     def print_system_info_Thread(self, trigger_pause=None, trigger_quit=None, number_of_snapshot=-1, delay=0.001, trigger_before=None, trigger_after=None):
 
@@ -188,7 +191,7 @@ class kiz_UI(Structure_UI):
 
         self.remove_camera_variables()
         
-        self.gui_widgets["camera_video_capture_button"].setText("Start Video Record")
+        self.gui_widgets["button_camera_connect"].setText("Start Video Record")
         self.garbage_Collector_Cleaner()
         self.set_video_capture_mod(False)
        
@@ -221,16 +224,16 @@ class kiz_UI(Structure_UI):
         self.stream_Switch(True)
         self.set_video_capture_mod(True)
         self.set_camera_status(status="connected") 
-        self.gui_widgets["camera_video_capture_button"].setText("Stop Video Record")
+        self.gui_widgets["button_camera_connect"].setText("Stop Video Record")
         
     def configure_Button_Connections(self):
-        self.camera_video_capture_button.clicked.connect(
+        self.button_camera_video_capture.clicked.connect(
             self.camera_video_capture_button_clicked
         )
-        self.camera_remove_button.clicked.connect(       
+        self.button_camera_connect.clicked.connect(       
             self.camera_connect_button_clicked
         )
-        self.camera_remove_button.clicked.connect(
+        self.button_camera_remove.clicked.connect(
             self.camera_remove_button_clicked
         )
    

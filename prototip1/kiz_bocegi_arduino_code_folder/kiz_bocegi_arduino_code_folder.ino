@@ -41,7 +41,6 @@ enum motors {
   MOTORS_RESET
 };
 
-
 enum print_flags{
   PRINT_MOTORS,
   PRINT_RPI,
@@ -75,8 +74,8 @@ typedef struct kiz_bocegi_code_shared{
   int a1;
   int a2;
 
-  int trigPinOn = 4;  //
-  int echoPinOn = 5;  //  >  On sensor
+  int trigPinOn = 10;  //
+  int echoPinOn = 11;  //  >  On sensor
   long sureOn;        //
   long uzaklikOn;     //
 
@@ -117,7 +116,7 @@ void communication_pins_configuration(){
 
 }
 
-void setup() {
+void setup(){
 
   set_default_sensors_parameters();
   distance_sensors_configurations();
@@ -173,7 +172,7 @@ void motors_status(motors flag){
     break;
   default:
     #if IS_PRINT
-        Serial.println("Wrong Flag for motors_status(): " + String(flag));
+        Serial.print("Wrong Flag for motors_status(): " + String(flag) + "\n");
     #endif
     break;
   }
@@ -203,7 +202,6 @@ int get_distance_sensors_backEnd(){
   digitalWrite(g_shared.trigPinArka, LOW);                  // Trig pinimizi pasif duruma getiriyoruz
   g_shared.sureArka = pulseIn(g_shared.echoPinArka, HIGH);  // Gonderilen dalganin geri donmesindeki sureyi olcuyor
   g_shared.uzaklikArka = g_shared.sureArka /29.1/2;         // Olctugu sureyi uzakliga ceviriyoruz
-  
   return g_shared.uzaklikArka;
 }
 
@@ -213,23 +211,19 @@ void print_info(print_flags flag){
 
   switch(flag){
     case PRINT_MOTORS:
-      Serial.println("INFO MOTORS:");
+      Serial.print("INFO MOTORS:\n");
       break;
 
     case PRINT_RPI:
-      Serial.println("INFO PRINT_RPI:");
+      Serial.print("INFO PRINT_RPI:");
       break;
       
     case PRINT_DISTANCE_SENSORS_FRONT:
-      Serial.print("Uzaklik On "); 
-      Serial.print(g_shared.uzaklikOn);
-      Serial.print(" cm *** \n");
+      Serial.println("Uzaklik On: " + String(g_shared.uzaklikOn)); 
       break;
 
     case PRINT_DISTANCE_SENSORS_BACKEND:
-      Serial.print("Uzaklik Arka "); 
-      Serial.print(g_shared.uzaklikArka);   //Olctugumuz uzakligi seri port ekranina yazdiriyoruz
-      Serial.println(" cm *** \n");
+      Serial.println("Uzaklik Arka: " + String(g_shared.uzaklikArka)); 
       break;
       
   }
@@ -254,18 +248,18 @@ void set_pin_distance(sensors flag){
   switch (flag)
   {
   case DISTANCE_SENSORS_FRONT:
-    if(g_shared.uzaklikOn > 100)    //200 cm ve üzeri tum uzakliklari 200 cm olarak sabitliyoruz
-    g_shared.uzaklikOn = 100;
+    if(g_shared.uzaklikOn > 200)    //200 cm ve üzeri tum uzakliklari 200 cm olarak sabitliyoruz
+    g_shared.uzaklikOn = 200;
     break;
   
   case DISTANCE_SENSORS_BACKEND:
-    if(g_shared.uzaklikArka > 100)  //200 cm ve üzeri tum uzakliklari 200 cm olarak sabitliyoruz
-    g_shared.uzaklikArka = 100;
+    if(g_shared.uzaklikArka > 200)  //200 cm ve üzeri tum uzakliklari 200 cm olarak sabitliyoruz
+    g_shared.uzaklikArka = 200;
     break;
   
   default:
     #if IS_PRINT
-        Serial.println("Wrong Flag for set_pin_distance(): " + String(flag));
+        Serial.print("Wrong Flag for set_pin_distance(): " + String(flag) + "\n");
     #endif
     break;
   }
@@ -281,6 +275,7 @@ void test_code_go_without_sensors(){
     delayMicroseconds(3000);
   }
 }
+
 void loop() {
   
   //test_code_go_without_sensors();
@@ -293,19 +288,20 @@ void set_sensor_stop_distance(int sensor_frontend, int sensor_backend){
   g_shared.stop_distance_frontend_sensor = sensor_frontend;
 }
 
-
 void scenario(){
   //  below lines are functions which calculate distance using distance_sensors and print info to serial monitor.
   
   get_distance_sensors_frontEnd();
-  set_pin_distance(DISTANCE_SENSORS_FRONT);
-
-  print_info(PRINT_DISTANCE_SENSORS_FRONT);
-  
   get_distance_sensors_backEnd();
+  set_pin_distance(DISTANCE_SENSORS_FRONT);
   set_pin_distance(DISTANCE_SENSORS_BACKEND);
-
+  print_info(PRINT_DISTANCE_SENSORS_FRONT);
   print_info(PRINT_DISTANCE_SENSORS_BACKEND);
+
+  if (Serial.find("Uzaklik On")){
+    String data = Serial.readString();
+    Serial.println("okunan veri: !" + data);
+  }
   
   // if(((g_shared.uzaklikOn > 0)&&(g_shared.uzaklikOn <= 5))&&((g_shared.uzaklikArka == 0)||(g_shared.uzaklikArka > 5))){
   //   motors_status(MOTORS_BACKWARD);
