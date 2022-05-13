@@ -20,12 +20,6 @@
 #define dirPin 10
 #define stepPin 9
 
-// Communication Pins
-#define input_pin_1 2
-#define input_pin_2 3
-
-#define output_pin_1 4
-#define output_pin_2 5
 
 ////////////////////
 // ENUM VARIABLES //
@@ -74,13 +68,13 @@ typedef struct kiz_bocegi_code_shared{
   int a1;
   int a2;
 
-  int trigPinOn = 10;  //
-  int echoPinOn = 11;  //  >  On sensor
+  int trigPinOn = 6;  //
+  int echoPinOn = 7;  //  >  On sensor
   long sureOn;        //
   long uzaklikOn;     //
 
-  int trigPinArka = 7;  //
-  int echoPinArka = 6;  //  >  Arka sensor
+  int trigPinArka = 5;  //
+  int echoPinArka = 4;  //  >  Arka sensor
   long sureArka;        //
   long uzaklikArka;     //
 
@@ -107,20 +101,10 @@ void set_default_sensors_parameters(){
   g_shared.a2 = 0;
 }
 
-void communication_pins_configuration(){
-  pinMode(input_pin_1, INPUT);
-  pinMode(input_pin_2, INPUT);
-
-  pinMode(output_pin_1, OUTPUT);
-  pinMode(output_pin_2, OUTPUT);
-
-}
-
 void setup(){
 
   set_default_sensors_parameters();
   distance_sensors_configurations();
-  communication_pins_configuration();
   
   #if IS_PRINT
     Serial.begin(9600);
@@ -208,26 +192,29 @@ int get_distance_sensors_backEnd(){
 void print_info(print_flags flag){
   // This function print all info variables to serial monitor. 
   // You must choose which variable write to serial monitor using print_flags .
+  #if IS_PRINT
 
-  switch(flag){
-    case PRINT_MOTORS:
-      Serial.print("INFO MOTORS:\n");
-      break;
+    switch(flag){
+      case PRINT_MOTORS:
+        Serial.print("INFO MOTORS:\n");
+        break;
 
-    case PRINT_RPI:
-      Serial.print("INFO PRINT_RPI:");
-      break;
-      
-    case PRINT_DISTANCE_SENSORS_FRONT:
-      Serial.println("Uzaklik On: " + String(g_shared.uzaklikOn)); 
-      break;
+      case PRINT_RPI:
+        Serial.print("INFO PRINT_RPI:");
+        break;
+        
+      case PRINT_DISTANCE_SENSORS_FRONT:
+        Serial.println("Uzaklik On: " + String(g_shared.uzaklikOn)); 
+        break;
 
-    case PRINT_DISTANCE_SENSORS_BACKEND:
-      Serial.println("Uzaklik Arka: " + String(g_shared.uzaklikArka)); 
-      break;
-      
-  }
-  delay(PRINT_DELAY_TIME);
+      case PRINT_DISTANCE_SENSORS_BACKEND:
+        Serial.println("Uzaklik Arka: " + String(g_shared.uzaklikArka)); 
+        break;
+        
+    }
+    delay(PRINT_DELAY_TIME);
+
+  #endif
 
 }
 
@@ -242,7 +229,7 @@ void print_info_all(){
     #endif
 }
 
-void set_pin_distance(sensors flag){
+void threasold_distance_sensors(sensors flag){
   // This function set new distance into distance sensors variables.
   
   switch (flag)
@@ -278,9 +265,9 @@ void test_code_go_without_sensors(){
 
 void loop() {
   
-  //test_code_go_without_sensors();
+  test_code_go_without_sensors();
   
-  scenario();
+  // scenario();
 }
 
 void set_sensor_stop_distance(int sensor_frontend, int sensor_backend){
@@ -288,20 +275,37 @@ void set_sensor_stop_distance(int sensor_frontend, int sensor_backend){
   g_shared.stop_distance_frontend_sensor = sensor_frontend;
 }
 
+int get_frontend_distance(){
+  return g_shared.uzaklikOn;
+}
+int get_backend_distance(){
+  return g_shared.uzaklikArka;
+}
+
 void scenario(){
   //  below lines are functions which calculate distance using distance_sensors and print info to serial monitor.
   
   get_distance_sensors_frontEnd();
   get_distance_sensors_backEnd();
-  set_pin_distance(DISTANCE_SENSORS_FRONT);
-  set_pin_distance(DISTANCE_SENSORS_BACKEND);
+  threasold_distance_sensors(DISTANCE_SENSORS_FRONT);
+  threasold_distance_sensors(DISTANCE_SENSORS_BACKEND);
   print_info(PRINT_DISTANCE_SENSORS_FRONT);
   print_info(PRINT_DISTANCE_SENSORS_BACKEND);
 
-  if (Serial.find("Uzaklik On")){
+  if (Serial.find("forward")){
     String data = Serial.readString();
-    Serial.println("okunan veri: !" + data);
+    motors_status(MOTORS_FORWARD);
   }
+  else if (Serial.find("backward")){
+    String data = Serial.readString();
+    motors_status(MOTORS_BACKWARD);
+  }
+
+
+  // if (Serial.find("Uzaklik On")){
+  //   String data = Serial.readString();
+  //   Serial.println("okunan veri: !" + data);
+  // }
   
   // if(((g_shared.uzaklikOn > 0)&&(g_shared.uzaklikOn <= 5))&&((g_shared.uzaklikArka == 0)||(g_shared.uzaklikArka > 5))){
   //   motors_status(MOTORS_BACKWARD);

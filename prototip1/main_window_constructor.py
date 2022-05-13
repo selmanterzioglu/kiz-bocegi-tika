@@ -1,4 +1,6 @@
+from cgi import print_arguments
 import glob
+from xml.etree.ElementTree import TreeBuilder
 import libs
 import logging
 from raspi_communication import RPI_Communication
@@ -41,8 +43,8 @@ class kiz_UI(Structure_UI):
         
         self.arduino_serial = test_communication.Arduino_communication()
         self.arduino_serial_recieve_data = None
-        self.arduino_frontend_distance = None
-        self.arduino_backend_distance = None
+        self.arduino_frontend_distance = 51
+        self.arduino_backend_distance = 51
 
         self.specialFunction = specialFunction()
         
@@ -58,6 +60,12 @@ class kiz_UI(Structure_UI):
         self.set_widgets()
         self.print_system_info_Thread(trigger_pause=None, trigger_quit=None, number_of_snapshot=-1, delay=0.001, trigger_before=None, trigger_after=None)
         self.read_arduino_Thread(trigger_pause=None, trigger_quit=None, number_of_snapshot=-1, delay=0.001, trigger_before=None, trigger_after=None)
+
+        self.cameras_status = True
+        self.car_status = "forward"
+        print("Kameralar Acildi")
+        self.frontend_sensor_check = True
+        self.backend_sensor_check = True
 
     def read_arduino_Thread(self, trigger_pause=None, trigger_quit=None, number_of_snapshot=-1, delay=0.001, trigger_before=None, trigger_after=None):
 
@@ -87,17 +95,32 @@ class kiz_UI(Structure_UI):
         else:
             return None
     
+
+    def autonomous_camera_on_off_control(self):
+        if (self.cameras_status == True):
+                self.cameras_status = False
+                
+                print("[INFO]: Kamera Kaydi  kapatiliyor..")
+                print("[INFO]: Kamera Kaydi kapatildi.")
+                print("[INFO]: Yeni kamera kaydi acildi. ")
+                print("backend: {}\n frontend: {}".format(self.arduino_backend_distance, self.arduino_frontend_distance) )
+                self.cameras_status = True
+                if (self.car_status == "forward"):
+                    self.car_status = "backward"
+                else:
+                    self.car_status = "forward"
+
     def read_arduino(self, trigger_pause=None, trigger_quit=None, number_of_snapshot=-1, delay=0.001, trigger_before=None, trigger_after=None):
 
         if (self.arduino_serial.arduino is not None):
             self.arduino_serial_recieve_data = self.arduino_serial.read_data_from_arduino()
 
             if (self.arduino_serial_recieve_data.find("Uzaklik On: ") != -1):
-                self.arduino_frontend_distance = self.arduino_serial_recieve_data.strip("Uzaklik On: ")
+                self.arduino_frontend_distance = int(self.arduino_serial_recieve_data.strip("Uzaklik On: "))
                 self.gui_widgets["label_frontend_distance"].setText("Frontend Distance: {} cm".format(self.arduino_frontend_distance))
 
             elif (self.arduino_serial_recieve_data.find("Uzaklik Arka: ") != -1):
-                self.arduino_backend_distance = self.arduino_serial_recieve_data.strip("Uzaklik Arka: ")
+                self.arduino_backend_distance = int(self.arduino_serial_recieve_data.strip("Uzaklik Arka: "))
                 self.gui_widgets["label_backend_distance"].setText("Backend Distance: {} cm".format(self.arduino_backend_distance))
         else:
             self.arduino_frontend_distance = -1
@@ -106,6 +129,19 @@ class kiz_UI(Structure_UI):
             self.gui_widgets["label_backend_distance"].setText("Backend Sensor is not found")
             self.set_statusbar_string("Sensor error! Sensors are not available.!")
 
+        # if (self.backend_sensor_check == True and self.arduino_backend_distance < 50 ):
+        #     self.backend_sensor_check = False
+        #     self.frontend_sensor_check  = True
+        #     self.autonomous_camera_on_off_control()
+
+        # elif (self.frontend_sensor_check == True and self.arduino_frontend_distance < 50 ):
+        #     self.backend_sensor_check = True
+        #     self.frontend_sensor_check  = False
+        #     self.autonomous_camera_on_off_control()
+
+            print("car_status: {}\ncameras_status: {}\n".format(self.car_status, self.cameras_status))
+
+            
     def print_system_info_Thread(self, trigger_pause=None, trigger_quit=None, number_of_snapshot=-1, delay=0.001, trigger_before=None, trigger_after=None):
 
         if self.get_Is_Object_Initialized():
