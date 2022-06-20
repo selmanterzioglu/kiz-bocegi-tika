@@ -58,8 +58,8 @@ class kiz_UI(Structure_UI):
         # self.system_o.thread_print_info()
 
         self.set_widgets()
-        self.print_system_info_Thread(trigger_pause=None, trigger_quit=None, number_of_snapshot=-1, delay=0.001, trigger_before=None, trigger_after=None)
-        self.read_arduino_Thread(trigger_pause=None, trigger_quit=None, number_of_snapshot=-1, delay=0.001, trigger_before=None, trigger_after=None)
+        # self.print_system_info_Thread(trigger_pause=None, trigger_quit=None, number_of_snapshot=-1, delay=0.001, trigger_before=None, trigger_after=None)
+        # self.read_arduino_Thread(trigger_pause=None, trigger_quit=None, number_of_snapshot=-1, delay=0.001, trigger_before=None, trigger_after=None)
 
         self.cameras_status = True
         self.car_status = "forward"
@@ -67,33 +67,40 @@ class kiz_UI(Structure_UI):
         self.frontend_sensor_check = True
         self.backend_sensor_check = True
 
-    def read_arduino_Thread(self, trigger_pause=None, trigger_quit=None, number_of_snapshot=-1, delay=0.001, trigger_before=None, trigger_after=None):
+    # def read_arduino_Thread(self, trigger_pause=None, trigger_quit=None, number_of_snapshot=-1, delay=0.001, trigger_before=None, trigger_after=None):
 
-        if self.get_Is_Object_Initialized():
-            self.__thread_Dict["read_arduino_Thread"] = Thread_Object(
-                name="Camera_Object.read_arduino_Thread",
-                delay=0.0001,
-                logger_level=self.logger.getEffectiveLevel(),
-                set_Deamon=True,
-                run_number=None,
-                quit_trigger=None
-            )
-            self.__thread_Dict["read_arduino_Thread"].init(
-                params = [
-                    trigger_pause,
-                    trigger_quit,
-                    number_of_snapshot,
-                    delay,
-                    trigger_before, 
-                    trigger_after
-                ],
-                task=self.read_arduino
-            )
-            self.__thread_Dict["read_arduino_Thread"].start()
+    #     if self.get_Is_Object_Initialized():
+    #         self.__thread_Dict["read_arduino_Thread"] = Thread_Object(
+    #             name="Camera_Object.read_arduino_Thread",
+    #             delay=0.0001,
+    #             logger_level=self.logger.getEffectiveLevel(),
+    #             set_Deamon=True,
+    #             run_number=None,
+    #             quit_trigger=None
+    #         )
+    #         name="Thread", 
+    #         delay=0.001, 
+    #         set_Daemon=True, 
+    #         run_number=None, 
+    #         quit_trigger=None, 
+    #         logger_level=logging.INFO, 
+    #         max_limit=10)
+    #         self.__thread_Dict["read_arduino_Thread"].init(
+    #             params = [
+    #                 trigger_pause,
+    #                 trigger_quit,
+    #                 number_of_snapshot,
+    #                 delay,
+    #                 trigger_before, 
+    #                 trigger_after
+    #             ],
+    #             task=self.read_arduino
+    #         )
+    #         self.__thread_Dict["read_arduino_Thread"].start()
 
-            return self.__thread_Dict["read_arduino_Thread"]
-        else:
-            return None
+    #         return self.__thread_Dict["read_arduino_Thread"]
+    #     else:
+    #         return None
     
 
     def autonomous_camera_on_off_control(self):
@@ -142,33 +149,34 @@ class kiz_UI(Structure_UI):
             print("car_status: {}\ncameras_status: {}\n".format(self.car_status, self.cameras_status))
 
             
-    def print_system_info_Thread(self, trigger_pause=None, trigger_quit=None, number_of_snapshot=-1, delay=0.001, trigger_before=None, trigger_after=None):
+    # def print_system_info_Thread(self, trigger_pause=None, trigger_quit=None, number_of_snapshot=-1, delay=0.001, trigger_before=None, trigger_after=None):
 
-        if self.get_Is_Object_Initialized():
-            self.__thread_Dict["print_system_info_Thread"] = Thread_Object(
-                name="Camera_Object.print_system_info_Thread",
-                delay=0.001,
-                logger_level=self.logger.getEffectiveLevel(),
-                set_Deamon=True,
-                run_number=None,
-                quit_trigger=None
-            )
-            self.__thread_Dict["print_system_info_Thread"].init(
-                params=[
-                    trigger_pause,
-                    trigger_quit,
-                    number_of_snapshot,
-                    delay,
-                    trigger_before, 
-                    trigger_after
-                ],
-                task=self.init_gui_thread
-            )
-            self.__thread_Dict["print_system_info_Thread"].start()
+    #     if self.get_Is_Object_Initialized():
+    #         self.__thread_Dict["print_system_info_Thread"] = Thread_Object(
+    #             name="Camera_Object.print_system_info_Thread",
+    #             delay=0.001,
+    #             logger_level=self.logger.getEffectiveLevel(),
+    #             set_Deamon=True,
+    #             run_number=None,
+    #             quit_trigger=None
+    #         )
+    #         self.__thread_Dict["print_system_info_Thread"].init(
+    #             params=[
+    #                 trigger_pause,
+    #                 trigger_quit,
+    #                 number_of_snapshot,
+    #                 delay,
+    #                 trigger_before, 
+    #                 trigger_after
+    #             ],
+    #             task=self.init_gui_thread
+    #         )
+    #         self.__thread_Dict["print_system_info_Thread"].start()
 
-            return self.__thread_Dict["print_system_info_Thread"]
-        else:
-            return None
+    #         return self.__thread_Dict["print_system_info_Thread"]
+    #     else:
+    #         return None
+
 
     def set_widgets(self):
         self.gui_widgets["cam_1_status_label"] = self.cam_1_status_label
