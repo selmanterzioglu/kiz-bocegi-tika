@@ -1,22 +1,20 @@
-// Include the Arduino Stepper Library
-#include <Stepper.h>
+// Include the AccelStepper library:
+#include <AccelStepper.h>
 
-// Number of steps per output rotation
-const int stepsPerRevolution = 200;
+// Define the AccelStepper interface type:
+#define MotorInterfaceType 4
 
-// Create Instance of Stepper library
-Stepper myStepper(stepsPerRevolution, 4, 5, 6, 7);
+// Create a new instance of the AccelStepper class:
+AccelStepper stepper = AccelStepper(MotorInterfaceType, 4, 5, 6, 7);
 
-
-void setup()
-{
-    Serial.begin(9600);
-	myStepper.setSpeed(100);
+void setup() {
+  // Set the maximum speed in steps per second:
+  stepper.setMaxSpeed(1000);
 }
 
-void loop() 
-{
-    myStepper.step(stepsPerRevolution);
-
-
+void loop() {
+  // Set the speed of the motor in steps per second:
+  stepper.setSpeed(500);
+  // Step the motor with constant speed as set by setSpeed():
+  stepper.runSpeed();
 }
