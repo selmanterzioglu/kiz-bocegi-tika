@@ -250,7 +250,7 @@ void setup()
 {
   distance_sensors_configurations();
   motor_configurations();
-  // interrupt();
+  interrupt();
 
   #if IS_PRINT
     Serial.begin(9600);
@@ -299,6 +299,7 @@ void scenario()
       set_motor_status(MOTORS_STOP);
       g_shared.route = -1;
       g_shared.lock_motor = 1;
+      delay(1000);
 
     }
     if (g_shared.lock_motor == 0)
@@ -312,13 +313,13 @@ void scenario()
       set_motor_status(MOTORS_STOP);
       g_shared.route = 1;
       g_shared.lock_motor = 1;
+      delay(1000);
     }
     if (g_shared.lock_motor == 0)
       set_motor_status(MOTORS_BACKWARD);
 
   }
 }
-
 void loop()
 {
   // test_print_distance();
