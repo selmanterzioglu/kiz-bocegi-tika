@@ -45,6 +45,9 @@ class kiz_UI(Structure_UI):
         self.arduino_serial_recieve_data = None
         self.arduino_frontend_distance = 51
         self.arduino_backend_distance = 51
+        self.arduino_route = 1
+        self.arduino_motors_lock = 1
+
 
         self.specialFunction = specialFunction()
         
@@ -58,125 +61,96 @@ class kiz_UI(Structure_UI):
         # self.system_o.thread_print_info()
 
         self.set_widgets()
-        # self.print_system_info_Thread(trigger_pause=None, trigger_quit=None, number_of_snapshot=-1, delay=0.001, trigger_before=None, trigger_after=None)
-        # self.read_arduino_Thread(trigger_pause=None, trigger_quit=None, number_of_snapshot=-1, delay=0.001, trigger_before=None, trigger_after=None)
+        self.print_system_info_Thread(trigger_pause=None, trigger_quit=None, number_of_snapshot=-1, delay=0.001, trigger_before=None, trigger_after=None)
+        self.read_arduino_Thread(trigger_pause=None, trigger_quit=None, number_of_snapshot=-1, delay=0.001, trigger_before=None, trigger_after=None)
 
-        self.cameras_status = True
-        self.car_status = "forward"
-        print("Kameralar Acildi")
-        self.frontend_sensor_check = True
-        self.backend_sensor_check = True
+    def read_arduino_Thread(self, trigger_pause=None, trigger_quit=None, number_of_snapshot=-1, delay=0.001, trigger_before=None, trigger_after=None):
 
-    # def read_arduino_Thread(self, trigger_pause=None, trigger_quit=None, number_of_snapshot=-1, delay=0.001, trigger_before=None, trigger_after=None):
+        if self.get_Is_Object_Initialized():
+            self.__thread_Dict["read_arduino_Thread"] = Thread_Object(
+                name="Camera_Object.read_arduino_Thread",
+                delay=0.0001,
+                logger_level=self.logger.getEffectiveLevel(),
+                run_number=None,
+                quit_trigger=None
+            )
+            self.__thread_Dict["read_arduino_Thread"].init(
+                params = [
+                    trigger_pause,
+                    trigger_quit,
+                    number_of_snapshot,
+                    delay,
+                    trigger_before, 
+                    trigger_after
+                ],
+                task=self.read_arduino
+            )
+            self.__thread_Dict["read_arduino_Thread"].start()
 
-    #     if self.get_Is_Object_Initialized():
-    #         self.__thread_Dict["read_arduino_Thread"] = Thread_Object(
-    #             name="Camera_Object.read_arduino_Thread",
-    #             delay=0.0001,
-    #             logger_level=self.logger.getEffectiveLevel(),
-    #             set_Deamon=True,
-    #             run_number=None,
-    #             quit_trigger=None
-    #         )
-    #         name="Thread", 
-    #         delay=0.001, 
-    #         set_Daemon=True, 
-    #         run_number=None, 
-    #         quit_trigger=None, 
-    #         logger_level=logging.INFO, 
-    #         max_limit=10)
-    #         self.__thread_Dict["read_arduino_Thread"].init(
-    #             params = [
-    #                 trigger_pause,
-    #                 trigger_quit,
-    #                 number_of_snapshot,
-    #                 delay,
-    #                 trigger_before, 
-    #                 trigger_after
-    #             ],
-    #             task=self.read_arduino
-    #         )
-    #         self.__thread_Dict["read_arduino_Thread"].start()
-
-    #         return self.__thread_Dict["read_arduino_Thread"]
-    #     else:
-    #         return None
-    
-
-    def autonomous_camera_on_off_control(self):
-        if (self.cameras_status == True):
-                self.cameras_status = False
-                
-                print("[INFO]: Kamera Kaydi  kapatiliyor..")
-                print("[INFO]: Kamera Kaydi kapatildi.")
-                print("[INFO]: Yeni kamera kaydi acildi. ")
-                print("backend: {}\n frontend: {}".format(self.arduino_backend_distance, self.arduino_frontend_distance) )
-                self.cameras_status = True
-                if (self.car_status == "forward"):
-                    self.car_status = "backward"
-                else:
-                    self.car_status = "forward"
+            return self.__thread_Dict["read_arduino_Thread"]
+        else:
+            return None
 
     def read_arduino(self, trigger_pause=None, trigger_quit=None, number_of_snapshot=-1, delay=0.001, trigger_before=None, trigger_after=None):
 
         if (self.arduino_serial.arduino is not None):
             self.arduino_serial_recieve_data = self.arduino_serial.read_data_from_arduino()
 
-            if (self.arduino_serial_recieve_data.find("Uzaklik On: ") != -1):
-                self.arduino_frontend_distance = int(self.arduino_serial_recieve_data.strip("Uzaklik On: "))
+            if (self.arduino_serial_recieve_data.find("frontend_distance: ") != -1):
+                self.arduino_frontend_distance = int(self.arduino_serial_recieve_data.strip("frontend_distance: "))
                 self.gui_widgets["label_frontend_distance"].setText("Frontend Distance: {} cm".format(self.arduino_frontend_distance))
 
-            elif (self.arduino_serial_recieve_data.find("Uzaklik Arka: ") != -1):
-                self.arduino_backend_distance = int(self.arduino_serial_recieve_data.strip("Uzaklik Arka: "))
+            elif (self.arduino_serial_recieve_data.find("backend_distance: ") != -1):
+                self.arduino_backend_distance = int(self.arduino_serial_recieve_data.strip("backend_distance: "))
                 self.gui_widgets["label_backend_distance"].setText("Backend Distance: {} cm".format(self.arduino_backend_distance))
+            
+            elif (self.arduino_serial_recieve_data.find("lock: ") != -1):
+                self.arduino_motors_lock = int(self.arduino_serial_recieve_data.strip("lock: "))
+                if (self.arduino_motors_lock == 1):
+                    self.gui_widgets["label_motors_lock"].setText("Motors Lock: Locked")
+                if (self.arduino_motors_lock == 0):
+                    self.gui_widgets["label_motors_lock"].setText("Motors Lock: Unlock")
+            
+            elif (self.arduino_serial_recieve_data.find("route: ") != -1):
+                self.arduino_route = int(self.arduino_serial_recieve_data.strip("route: "))
+                if (self.arduino_route == 1):
+                    self.gui_widgets["label_route"].setText("Route: Forward")
+                if (self.arduino_route == 0):
+                    self.gui_widgets["label_route"].setText("Route: Backward")
+         
         else:
             self.arduino_frontend_distance = -1
             self.arduino_backend_distance = -1
             self.gui_widgets["label_frontend_distance"].setText("Frontend Sensor is not found")
             self.gui_widgets["label_backend_distance"].setText("Backend Sensor is not found")
             self.set_statusbar_string("Sensor error! Sensors are not available.!")
+              
+    def print_system_info_Thread(self, trigger_pause=None, trigger_quit=None, number_of_snapshot=-1, delay=0.001, trigger_before=None, trigger_after=None):
 
-        # if (self.backend_sensor_check == True and self.arduino_backend_distance < 50 ):
-        #     self.backend_sensor_check = False
-        #     self.frontend_sensor_check  = True
-        #     self.autonomous_camera_on_off_control()
+        if self.get_Is_Object_Initialized():
+            self.__thread_Dict["print_system_info_Thread"] = Thread_Object(
+                name="Camera_Object.print_system_info_Thread",
+                delay=0.001,
+                logger_level=self.logger.getEffectiveLevel(),
+                run_number=None,
+                quit_trigger=None
+            )
+            self.__thread_Dict["print_system_info_Thread"].init(
+                params=[
+                    trigger_pause,
+                    trigger_quit,
+                    number_of_snapshot,
+                    delay,
+                    trigger_before, 
+                    trigger_after
+                ],
+                task=self.init_gui_thread
+            )
+            self.__thread_Dict["print_system_info_Thread"].start()
 
-        # elif (self.frontend_sensor_check == True and self.arduino_frontend_distance < 50 ):
-        #     self.backend_sensor_check = True
-        #     self.frontend_sensor_check  = False
-        #     self.autonomous_camera_on_off_control()
-
-            print("car_status: {}\ncameras_status: {}\n".format(self.car_status, self.cameras_status))
-
-            
-    # def print_system_info_Thread(self, trigger_pause=None, trigger_quit=None, number_of_snapshot=-1, delay=0.001, trigger_before=None, trigger_after=None):
-
-    #     if self.get_Is_Object_Initialized():
-    #         self.__thread_Dict["print_system_info_Thread"] = Thread_Object(
-    #             name="Camera_Object.print_system_info_Thread",
-    #             delay=0.001,
-    #             logger_level=self.logger.getEffectiveLevel(),
-    #             set_Deamon=True,
-    #             run_number=None,
-    #             quit_trigger=None
-    #         )
-    #         self.__thread_Dict["print_system_info_Thread"].init(
-    #             params=[
-    #                 trigger_pause,
-    #                 trigger_quit,
-    #                 number_of_snapshot,
-    #                 delay,
-    #                 trigger_before, 
-    #                 trigger_after
-    #             ],
-    #             task=self.init_gui_thread
-    #         )
-    #         self.__thread_Dict["print_system_info_Thread"].start()
-
-    #         return self.__thread_Dict["print_system_info_Thread"]
-    #     else:
-    #         return None
-
+            return self.__thread_Dict["print_system_info_Thread"]
+        else:
+            return None
 
     def set_widgets(self):
         self.gui_widgets["cam_1_status_label"] = self.cam_1_status_label
@@ -192,6 +166,8 @@ class kiz_UI(Structure_UI):
         self.gui_widgets["label_used_memory"] = self.label_used_memory
         self.gui_widgets["label_frontend_distance"] = self.label_frontend_distance
         self.gui_widgets["label_backend_distance"] = self.label_backend_distance
+        self.gui_widgets["label_motors_lock"] = self.label_motors_lock
+        self.gui_widgets["label_route"] = self.label_route
 
     def init_gui_thread(self, trigger_pause=None, trigger_quit=None, number_of_snapshot=-1, delay=0.001, trigger_before=None, trigger_after=None):
         cpu_percent = "Used CPU: {}".format(self.system_o.cpu_percent_Psutil())        
@@ -207,6 +183,7 @@ class kiz_UI(Structure_UI):
         else:
             self.available_cameras = self.get_camera_available_port()
             self.available_cameras_counter = len(self.available_cameras)
+            print(self.available_cameras_counter)
             self.start_video_record()
 
     def camera_connect_button_clicked(self):
