@@ -1,5 +1,11 @@
 # Kiz Bocegi Tika
 
+
+
+1. get into to lera-developer-frameworks, and run this command
+2. git checkout e04ca21a
+
+
 if you are get warning below code when you install virtualenv:
 
 Consider adding this directory to PATH or, if you prefer to suppress this warning, use --no-warn-script-location.
