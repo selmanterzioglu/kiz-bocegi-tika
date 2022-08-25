@@ -218,7 +218,6 @@ void read_serial(){
       int new_speed = serial_message.toInt();
       set_speed(new_speed);
   }
-
 }
 
 void test_code_go_without_sensors()
@@ -245,7 +244,6 @@ void interrupt ()
 
 }
 
-
 void setup()
 {
   distance_sensors_configurations();
@@ -258,30 +256,42 @@ void setup()
   #endif
 }
 
-ISR(TIMER1_COMPA_vect)
-{  
-  Serial.print("[DEBUG] ");
-  Serial.print(" route: " + String(g_shared.route));
-  Serial.print(" lock: " + String(g_shared.lock_motor));
-  Serial.print(" front: " + String(g_shared.distance_front));
-  Serial.println(" backend: " + String(g_shared.distance_backend));
-
-  if(g_shared.route == 1)
-    check_distance_sensors(DISTANCE_SENSORS_FRONT);
-  
-  else if (g_shared.route == -1)
-    check_distance_sensors(DISTANCE_SENSORS_BACKEND);
-
+void print_vehicle_status(){
+  Serial.println("lock: " + String(g_shared.lock_motor));
+  Serial.println("route: " + String(g_shared.route));
+  Serial.println("motors_status: " + String(g_shared.status));
 }
 
-void test_print_distance()
+void print_distance(sensors sensor)
 {
-  check_distance_sensors(DISTANCE_SENSORS_FRONT);
-  check_distance_sensors(DISTANCE_SENSORS_BACKEND);
+  switch (sensor)
+  {
+  case DISTANCE_SENSORS_FRONT:
+    Serial.println("frontend_distance: " + String(g_shared.distance_front));
+    break;
+    
+  case DISTANCE_SENSORS_BACKEND:
+    Serial.println("backend_distance: " + String(g_shared.distance_backend));
+    break;
+  }
+}
 
-  Serial.print("[DEBUG] ");
-  Serial.print(" front: " + String(g_shared.distance_front));
-  Serial.println(" backend: " + String(g_shared.distance_backend));
+
+ISR(TIMER1_COMPA_vect)
+{  
+  print_vehicle_status();
+
+  if(g_shared.route == 1)
+  {
+    check_distance_sensors(DISTANCE_SENSORS_FRONT);
+    print_distance(DISTANCE_SENSORS_FRONT);
+  }
+  
+  else if (g_shared.route == -1)
+  {
+    check_distance_sensors(DISTANCE_SENSORS_BACKEND);
+    print_distance(DISTANCE_SENSORS_BACKEND);
+  }
 
 }
 
@@ -289,11 +299,11 @@ void scenario()
 {
   //  below lines are functions which calculate distance using distance_sensors and print info to serial monitor.
   
-
   read_serial();
 
   if (g_shared.route == 1)
   {
+    g_shared.distance_backend = -1;
     if (g_shared.distance_front <= g_shared.stop_distance_frontend_sensor)
     {
       set_motor_status(MOTORS_STOP);
@@ -308,6 +318,7 @@ void scenario()
   }
   else if (g_shared.route == -1) 
   {
+    g_shared.distance_front = -1;
     if (g_shared.distance_backend <= g_shared.stop_distance_backend_sensor)
     {
       set_motor_status(MOTORS_STOP);
@@ -317,14 +328,10 @@ void scenario()
     }
     if (g_shared.lock_motor == 0)
       set_motor_status(MOTORS_BACKWARD);
-
   }
 }
 void loop()
 {
-  // test_print_distance();
-  // test_code_go_without_sensors();
-  
   scenario();
 }
 
