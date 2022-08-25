@@ -1,3 +1,4 @@
+from asyncore import read
 import serial
 import time
 
@@ -18,12 +19,13 @@ class Arduino_communication():
         for com_number in range(10):
             port = 'COM' + str(com_number)
             try: 
-                arduino = serial.Serial(port=port, baudrate=9600)
+                arduino = serial.Serial(port=port, baudrate=9600, timeout=.1)
                 if (arduino is not None):
-                    print("[DEBUG]: Arduino Port: {}".format(port))
+                    break
             except serial.serialutil.SerialException:
                 continue
         if arduino == None:
+            port = None
             print("[WARNING]: Arduino port is not found.!")
             
         return port,arduino
@@ -34,9 +36,14 @@ class Arduino_communication():
             read_data = self.arduino.readline().decode().strip("\n")
         except UnicodeDecodeError:
             pass    
-        
+            
         return read_data
 
     def send_data_to_arduino(self, sended_data):
-        self.arduino.write(sended_data.encode())
+        if (type(sended_data) == str):
+            self.arduino.write(sended_data.encode())
+
+        elif (type(sended_data) == int):
+            self.arduino.write(sended_data)
+
         time.sleep(0.05)
