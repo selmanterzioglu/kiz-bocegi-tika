@@ -255,6 +255,11 @@
       <layout class="QGridLayout" name="gridLayout_3">
        <item row="0" column="0">
         <widget class="QLabel" name="label_backend_distance">
+         <property name="font">
+          <font>
+           <pointsize>10</pointsize>
+          </font>
+         </property>
          <property name="text">
           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Backend Distance: None&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
@@ -262,6 +267,11 @@
        </item>
        <item row="1" column="0">
         <widget class="QLabel" name="label_frontend_distance">
+         <property name="font">
+          <font>
+           <pointsize>10</pointsize>
+          </font>
+         </property>
          <property name="text">
           <string>Frontend Distance: None</string>
          </property>
@@ -269,6 +279,11 @@
        </item>
        <item row="2" column="0">
         <widget class="QLabel" name="label_motors_lock">
+         <property name="font">
+          <font>
+           <pointsize>10</pointsize>
+          </font>
+         </property>
          <property name="text">
           <string>Motors Lock: None</string>
          </property>
@@ -276,6 +291,11 @@
        </item>
        <item row="3" column="0">
         <widget class="QLabel" name="label_route">
+         <property name="font">
+          <font>
+           <pointsize>10</pointsize>
+          </font>
+         </property>
          <property name="text">
           <string>Route: None</string>
          </property>
@@ -283,6 +303,11 @@
        </item>
        <item row="4" column="0">
         <widget class="QLabel" name="label_used_cpu">
+         <property name="font">
+          <font>
+           <pointsize>10</pointsize>
+          </font>
+         </property>
          <property name="text">
           <string>Used CPU: None</string>
          </property>
@@ -290,6 +315,11 @@
        </item>
        <item row="5" column="0">
         <widget class="QLabel" name="label_used_memory">
+         <property name="font">
+          <font>
+           <pointsize>10</pointsize>
+          </font>
+         </property>
          <property name="text">
           <string>Used Memory: None</string>
          </property>

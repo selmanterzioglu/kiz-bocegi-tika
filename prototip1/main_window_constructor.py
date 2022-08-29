@@ -1,6 +1,4 @@
-from cgi import print_arguments
 import glob
-from xml.etree.ElementTree import TreeBuilder
 import libs
 import logging
 from raspi_communication import RPI_Communication
@@ -43,11 +41,11 @@ class kiz_UI(Structure_UI):
         
         self.arduino_serial = test_communication.Arduino_communication()
         self.arduino_serial_recieve_data = None
-        self.arduino_frontend_distance = 51
-        self.arduino_backend_distance = 51
+        self.arduino_frontend_distance = 0
+        self.arduino_backend_distance = 0
         self.arduino_route = 1
-        self.arduino_motors_lock = 1
-
+        self.arduino_motors_lock = 0
+        self.arduino_motors_lock_last = 0
 
         self.specialFunction = specialFunction()
         
@@ -63,6 +61,8 @@ class kiz_UI(Structure_UI):
         self.set_widgets()
         self.print_system_info_Thread(trigger_pause=None, trigger_quit=None, number_of_snapshot=-1, delay=0.001, trigger_before=None, trigger_after=None)
         self.read_arduino_Thread(trigger_pause=None, trigger_quit=None, number_of_snapshot=-1, delay=0.001, trigger_before=None, trigger_after=None)
+
+        self.camera_video_capture()
 
     def read_arduino_Thread(self, trigger_pause=None, trigger_quit=None, number_of_snapshot=-1, delay=0.001, trigger_before=None, trigger_after=None):
 
@@ -113,11 +113,19 @@ class kiz_UI(Structure_UI):
             
             elif (self.arduino_serial_recieve_data.find("route: ") != -1):
                 self.arduino_route = int(self.arduino_serial_recieve_data.strip("route: "))
-                if (self.arduino_route == 1):
-                    self.gui_widgets["label_route"].setText("Route: Forward")
+                
+                self.gui_widgets["label_route"].setText("Route: Forward")
                 if (self.arduino_route == 0):
                     self.gui_widgets["label_route"].setText("Route: Backward")
-         
+
+            if (self.arduino_motors_lock == 1 and self.arduino_motors_lock_last == 0):
+                self.camera_video_capture()
+                self.arduino_serial.send_data_to_arduino("motors_unlock")
+                self.arduino_motors_lock_last = 1
+                
+            elif (self.arduino_motors_lock == 0 and self.arduino_motors_lock_last == 1):
+                self.camera_video_capture()
+                self.arduino_motors_lock_last = 0
         else:
             self.arduino_frontend_distance = -1
             self.arduino_backend_distance = -1
@@ -186,6 +194,15 @@ class kiz_UI(Structure_UI):
             print(self.available_cameras_counter)
             self.start_video_record()
 
+    def camera_video_capture(self):
+        if self.is_video_capture_mod():
+            self.stop_video_record()
+        else:
+            self.available_cameras = self.get_camera_available_port()
+            self.available_cameras_counter = len(self.available_cameras)
+            print(self.available_cameras_counter)
+            self.start_video_record()
+
     def camera_connect_button_clicked(self):
         self.available_cameras = self.get_camera_available_port()
         self.available_cameras_counter = len(self.available_cameras)
@@ -212,7 +229,7 @@ class kiz_UI(Structure_UI):
 
         self.remove_camera_variables()
         
-        self.gui_widgets["button_camera_connect"].setText("Start Video Record")
+        self.gui_widgets["button_camera_video_capture"].setText("Start Video Record")
         self.garbage_Collector_Cleaner()
         self.set_video_capture_mod(False)
        
@@ -245,7 +262,7 @@ class kiz_UI(Structure_UI):
         self.stream_Switch(True)
         self.set_video_capture_mod(True)
         self.set_camera_status(status="connected") 
-        self.gui_widgets["button_camera_connect"].setText("Stop Video Record")
+        self.gui_widgets["button_camera_video_capture"].setText("Stop Video Record")
         
     def configure_Button_Connections(self):
         self.button_camera_video_capture.clicked.connect(
