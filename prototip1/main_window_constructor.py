@@ -1,7 +1,6 @@
 import glob
 import libs
 import logging
-from raspi_communication import RPI_Communication
 from specialFunciton import specialFunction
 from structure_ui import Structure_UI, Graphics_View
 from structure_camera import Camera_Object, CAMERA_FLAGS
@@ -373,6 +372,8 @@ class kiz_UI(Structure_UI):
             #     self.cameras[cam_string].api_CV2_Camera_Create_Instance(self.available_cameras[counter], extra_params = [cv2.CAP_V4L2])
             if (self.specialFunction.get_os_platform() == "linux" or self.specialFunction.get_os_platform() == "linux2"):
                 self.cameras[cam_string].api_CV2_Camera_Create_Instance(self.available_cameras[counter], extra_params = [cv2.CAP_V4L2])
+            else:
+                self.cameras[cam_string].api_CV2_Camera_Create_Instance(self.available_cameras[counter], extra_params = [cv2.CAP_MSMF])
 
             counter +=1
 
@@ -482,7 +483,7 @@ class kiz_UI(Structure_UI):
             except TypeError:
                 pass
             source -= 1
-        
+        print(available_port)
         return available_port
 
     def is_Stream_Active(self):
