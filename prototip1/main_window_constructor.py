@@ -38,31 +38,36 @@ class kiz_UI(Structure_UI):
         self.video_directory = "video_data_folder/"
         self.is_Object_Initialized = True
         self.video_thread_quit = None
-        
-        self.arduino_serial = test_communication.Arduino_communication()
-        self.arduino_serial_recieve_data = None
-        self.arduino_frontend_distance = 0
-        self.arduino_backend_distance = 0
-        self.arduino_route = 1
-        self.arduino_motors_lock = 0
-        self.arduino_motors_lock_last = 0
-
         self.specialFunction = specialFunction()
+        
+        self.simulation_mode = False
         
         self.init()
     
     def init(self):
         self.name = "KizUI"
         self.logger = logging.getLogger(self.name)
-
+        
         self.system_o = System_Object()
-        # self.system_o.thread_print_info()
-
         self.set_widgets()
-        self.print_system_info_Thread(trigger_pause=None, trigger_quit=None, number_of_snapshot=-1, delay=0.001, trigger_before=None, trigger_after=None)
-        self.read_arduino_Thread(trigger_pause=None, trigger_quit=None, number_of_snapshot=-1, delay=0.001, trigger_before=None, trigger_after=None)
 
-        self.camera_video_capture()
+        # self.system_o.thread_print_info()
+        self.print_system_info_Thread(trigger_pause=None, trigger_quit=None, number_of_snapshot=-1, delay=0.001, trigger_before=None, trigger_after=None)
+            
+        if (self.simulation_mode == False):
+            self.arduino_serial = test_communication.Arduino_communication()
+            if (self.arduino_serial.arduino == None):
+                self.set_statusbar_string("Arduino is not found. ! ")
+            else: 
+                self.arduino_serial_recieve_data = None
+                self.arduino_frontend_distance = 0
+                self.arduino_backend_distance = 0
+                self.arduino_route = 1
+                self.arduino_motors_lock = 0
+                self.arduino_motors_lock_last = 0
+
+                self.read_arduino_Thread(trigger_pause=None, trigger_quit=None, number_of_snapshot=-1, delay=0.001, trigger_before=None, trigger_after=None)
+                self.camera_video_capture()
 
     def read_arduino_Thread(self, trigger_pause=None, trigger_quit=None, number_of_snapshot=-1, delay=0.001, trigger_before=None, trigger_after=None):
 
@@ -191,7 +196,6 @@ class kiz_UI(Structure_UI):
         else:
             self.available_cameras = self.get_camera_available_port()
             self.available_cameras_counter = len(self.available_cameras)
-            print(self.available_cameras_counter)
             self.start_video_record()
 
     def camera_video_capture(self):
@@ -200,7 +204,6 @@ class kiz_UI(Structure_UI):
         else:
             self.available_cameras = self.get_camera_available_port()
             self.available_cameras_counter = len(self.available_cameras)
-            print(self.available_cameras_counter)
             self.start_video_record()
 
     def camera_connect_button_clicked(self):
@@ -455,16 +458,21 @@ class kiz_UI(Structure_UI):
     def closeEvent(self, *args, **kwargs):
         super(kiz_UI, self).closeEvent(*args, **kwargs)
 
-    @staticmethod
-    def get_camera_available_port():
+    
+    def get_camera_available_port(self):
         """ This function search available camera port on pc """
 
         source = 10
         available_port = []
-        
+        camera = None
+
         while source >=0:
             try:
-                camera = cv2.VideoCapture(source)
+                if (self.specialFunction.get_os_platform() == "win32"):
+                    camera = cv2.VideoCapture(source, cv2.CAP_MSMF)
+                else:
+                    camera = cv2.VideoCapture(source)
+
                 is_reading, img = camera.read()
                 if camera.isOpened() and is_reading is True:
                     available_port.append(source)  
@@ -474,6 +482,7 @@ class kiz_UI(Structure_UI):
             except TypeError:
                 pass
             source -= 1
+        
         return available_port
 
     def is_Stream_Active(self):
