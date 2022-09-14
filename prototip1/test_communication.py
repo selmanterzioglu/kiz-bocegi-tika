@@ -21,7 +21,24 @@ class Arduino_communication():
             try: 
                 arduino = serial.Serial(port=port, baudrate=9600, timeout=.1)
                 if (arduino is not None):
-                    break
+                    return port,arduino
+            except serial.serialutil.SerialException:
+                continue
+        for com_number in range(10):
+            port = '/dev/ttyACM' + str(com_number)
+            try: 
+                arduino = serial.Serial(port=port, baudrate=9600, timeout=.1)
+                if (arduino is not None):
+                    return port,arduino
+            except serial.serialutil.SerialException:
+                continue
+        for com_number in range(10):
+            port = '/dev/ttyUSB' + str(com_number)
+            print("port: " + port)
+            try: 
+                arduino = serial.Serial(port=port, baudrate=9600, timeout=.1)
+                if (arduino is not None):
+                    return port,arduino
             except serial.serialutil.SerialException:
                 continue
         if arduino == None:
