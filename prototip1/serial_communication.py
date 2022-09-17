@@ -34,7 +34,6 @@ class Arduino_communication():
                 continue
         for com_number in range(10):
             port = '/dev/ttyUSB' + str(com_number)
-            print("port: " + port)
             try: 
                 arduino = serial.Serial(port=port, baudrate=9600, timeout=.1)
                 if (arduino is not None):
