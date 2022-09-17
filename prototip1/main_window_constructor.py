@@ -12,7 +12,7 @@ from tools import list_files
 from video_file_process import File_Process
 from structure_threading import Thread_Object
 import sys
-import test_communication
+import serial_communication
 from specialFunciton import specialFunction
 
 class kiz_UI(Structure_UI):
@@ -54,7 +54,7 @@ class kiz_UI(Structure_UI):
         self.print_system_info_Thread(trigger_pause=None, trigger_quit=None, number_of_snapshot=-1, delay=0.001, trigger_before=None, trigger_after=None)
             
         if (self.simulation_mode == False):
-            self.arduino_serial = test_communication.Arduino_communication()
+            self.arduino_serial = serial_communication.Arduino_communication()
             if (self.arduino_serial.arduino == None):
                 self.set_statusbar_string("Arduino is not found. ! ")
             else: 
