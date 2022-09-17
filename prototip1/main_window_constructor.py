@@ -118,9 +118,10 @@ class kiz_UI(Structure_UI):
             elif (self.arduino_serial_recieve_data.find("route: ") != -1):
                 self.arduino_route = int(self.arduino_serial_recieve_data.strip("route: "))
                 
-                self.gui_widgets["label_route"].setText("Route: Forward")
-                if (self.arduino_route == 0):
+                if(self.arduino_route == -1):
                     self.gui_widgets["label_route"].setText("Route: Backward")
+                elif (self.arduino_route == 1):
+                    self.gui_widgets["label_route"].setText("Route: Forward")
 
             if (self.arduino_motors_lock == 1 and self.arduino_motors_lock_last == 0):
                 self.camera_video_capture()
@@ -270,12 +271,8 @@ class kiz_UI(Structure_UI):
         self.button_camera_video_capture.clicked.connect(
             self.camera_video_capture_button_clicked
         )
-        self.button_camera_connect.clicked.connect(       
-            self.camera_connect_button_clicked
-        )
-        self.button_camera_remove.clicked.connect(
-            self.camera_remove_button_clicked
-        )
+        # self.button_camera_connect.clicked.connect(self.camera_connect_button_clicked)
+        # self.button_camera_remove.clicked.connect(self.camera_remove_button_clicked)
    
     def set_video_capture_mod(self, bool):
         self.video_capture_mod = bool
@@ -483,7 +480,6 @@ class kiz_UI(Structure_UI):
             except TypeError:
                 pass
             source -= 1
-        print(available_port)
         return available_port
 
     def is_Stream_Active(self):
