@@ -1,4 +1,5 @@
 import glob
+from itertools import count
 import libs
 import logging
 from specialFunciton import specialFunction
@@ -372,7 +373,7 @@ class kiz_UI(Structure_UI):
             # if (self.specialFunction.get_os_platform == "win32"):
             #     self.cameras[cam_string].api_CV2_Camera_Create_Instance(self.available_cameras[counter], extra_params = [cv2.CAP_V4L2])
             if (self.specialFunction.get_os_platform() == "linux" or self.specialFunction.get_os_platform() == "linux2"):
-                self.cameras[cam_string].api_CV2_Camera_Create_Instance(self.available_cameras[counter], extra_params = [cv2.CAP_V4L2])
+                self.cameras[cam_string].api_CV2_Camera_Create_Instance(self.available_cameras["/dev/video{}".format(counter)])
             else:
                 self.cameras[cam_string].api_CV2_Camera_Create_Instance(self.available_cameras[counter], extra_params = [cv2.CAP_MSMF])
 
@@ -472,7 +473,7 @@ class kiz_UI(Structure_UI):
                 if (self.specialFunction.get_os_platform() == "win32"):
                     camera = cv2.VideoCapture(source, cv2.CAP_MSMF)
                 else:
-                    camera = cv2.VideoCapture(source)
+                    camera = cv2.VideoCapture("/dev/video{}".format(source))
 
                 is_reading, img = camera.read()
                 if camera.isOpened() and is_reading is True:
