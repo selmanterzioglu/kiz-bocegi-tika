@@ -253,15 +253,27 @@
        <string>System Info</string>
       </property>
       <layout class="QGridLayout" name="gridLayout_3">
-       <item row="0" column="0">
-        <widget class="QLabel" name="label_backend_distance">
+       <item row="6" column="0">
+        <widget class="QLabel" name="label_used_memory">
          <property name="font">
           <font>
            <pointsize>10</pointsize>
           </font>
          </property>
          <property name="text">
-          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Backend Distance: None&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          <string>Used Memory: None</string>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="0">
+        <widget class="QLabel" name="label_used_cpu">
+         <property name="font">
+          <font>
+           <pointsize>10</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>Used CPU: None</string>
          </property>
         </widget>
        </item>
@@ -274,6 +286,18 @@
          </property>
          <property name="text">
           <string>Frontend Distance: None</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="0">
+        <widget class="QLabel" name="label_backend_distance">
+         <property name="font">
+          <font>
+           <pointsize>10</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Backend Distance: None&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
         </widget>
        </item>
@@ -302,30 +326,6 @@
         </widget>
        </item>
        <item row="4" column="0">
-        <widget class="QLabel" name="label_used_cpu">
-         <property name="font">
-          <font>
-           <pointsize>10</pointsize>
-          </font>
-         </property>
-         <property name="text">
-          <string>Used CPU: None</string>
-         </property>
-        </widget>
-       </item>
-       <item row="5" column="0">
-        <widget class="QLabel" name="label_used_memory">
-         <property name="font">
-          <font>
-           <pointsize>10</pointsize>
-          </font>
-         </property>
-         <property name="text">
-          <string>Used Memory: None</string>
-         </property>
-        </widget>
-       </item>
-       <item row="6" column="0">
         <widget class="QLabel" name="label_device_port">
          <property name="font">
           <font>
