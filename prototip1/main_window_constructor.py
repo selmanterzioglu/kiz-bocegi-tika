@@ -54,7 +54,7 @@ class kiz_UI(Structure_UI):
         self.set_widgets()
 
         # self.system_o.thread_print_info()
-        self.print_system_info_Thread(trigger_pause=None, trigger_quit=None, number_of_snapshot=-1, delay=0.001, trigger_before=None, trigger_after=None)
+        self.print_system_info_Thread(trigger_pause=None, trigger_quit=None, number_of_snapshot=-1, delay=0.01, trigger_before=None, trigger_after=None)
             
         if (self.simulation_mode == False):
             self.arduino_serial = serial_communication.Arduino_communication()
@@ -65,7 +65,7 @@ class kiz_UI(Structure_UI):
                 
                 self.arduino_serial_recieve_data = None
                 self.arduino_frontend_distance = 0
-                self.arduino_backend_distance = 0
+                self.arduino_backend_distance = 0 
                 self.arduino_route = 1
                 self.arduino_motors_lock = 0
                 self.arduino_motors_lock_last = 0
@@ -223,7 +223,7 @@ class kiz_UI(Structure_UI):
         self.camera_qtimer_creater_runner()
 
         self.autonomous_Camera_Instance()
-        self.camera_set_resolution(width=1920, height=1080)
+        self.camera_set_resolution(width=640, height=480)
         self.autonomous_Camera_Thread_Starter()
         self.stream_Switch(True)
         self.set_camera_status(status="connected")
@@ -268,7 +268,7 @@ class kiz_UI(Structure_UI):
 
         self.camera_qtimer_creater_runner()
         self.autonomous_Camera_Instance()
-        self.camera_set_resolution(width=1920, height=1080)
+        self.camera_set_resolution(width=640, height=480)
         self.set_video_thread_quit(None)
         self.video_record_Thread_Starter()
         self.stream_Switch(True)
