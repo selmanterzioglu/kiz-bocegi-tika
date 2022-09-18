@@ -39,7 +39,8 @@ class kiz_UI(Structure_UI):
         self.video_thread_quit = None
         self.specialFunction = specialFunction()
         
-        self.simulation_mode = False
+        self.first_usage = False
+        self.simulation_mode = True
         
         self.init()
     
@@ -190,20 +191,24 @@ class kiz_UI(Structure_UI):
         self.gui_widgets["label_used_memory"].setText(memory_usage)
 
     def camera_video_capture_button_clicked(self):
-
         if self.is_video_capture_mod():
             self.stop_video_record()
         else:
-            self.available_cameras = self.get_camera_available_port()
-            self.available_cameras_counter = len(self.available_cameras)
+            if (self.first_usage == False):
+                self.first_usage = True
+                self.available_cameras = self.get_camera_available_port()
+                self.available_cameras_counter = len(self.available_cameras)
             self.start_video_record()
 
     def camera_video_capture(self):
         if self.is_video_capture_mod():
             self.stop_video_record()
         else:
-            self.available_cameras = self.get_camera_available_port()
-            self.available_cameras_counter = len(self.available_cameras)
+            if (self.first_usage == False):
+                self.first_usage = True
+                self.available_cameras = self.get_camera_available_port()
+                self.available_cameras_counter = len(self.available_cameras)
+            
             self.start_video_record()
 
     def camera_connect_button_clicked(self):
@@ -233,7 +238,7 @@ class kiz_UI(Structure_UI):
         self.remove_camera_variables()
         
         self.gui_widgets["button_camera_video_capture"].setText("Start Video Record")
-        self.garbage_Collector_Cleaner()
+        # self.garbage_Collector_Cleaner()
         self.set_video_capture_mod(False)
        
     def remove_camera_variables(self):
@@ -251,9 +256,8 @@ class kiz_UI(Structure_UI):
         for i in Buffer_Dict_keys:
             del self.Buffer_Dict[i]
         
-        
-        self.available_cameras = None
-        self.available_cameras_counter = 0
+        # self.available_cameras = None
+        # self.available_cameras_counter = 0
 
     def start_video_record(self):
 
@@ -459,7 +463,6 @@ class kiz_UI(Structure_UI):
     
     def get_camera_available_port(self):
         """ This function search available camera port on pc """
-
         source = 10
         available_port = []
         camera = None
