@@ -1,5 +1,6 @@
 import glob
 from itertools import count
+from sqlite3 import Timestamp
 import libs
 import logging
 from specialFunciton import specialFunction
@@ -373,7 +374,7 @@ class kiz_UI(Structure_UI):
             # if (self.specialFunction.get_os_platform == "win32"):
             #     self.cameras[cam_string].api_CV2_Camera_Create_Instance(self.available_cameras[counter], extra_params = [cv2.CAP_V4L2])
             if (self.specialFunction.get_os_platform() == "linux" or self.specialFunction.get_os_platform() == "linux2"):
-                self.cameras[cam_string].api_CV2_Camera_Create_Instance(self.available_cameras["/dev/video{}".format(counter)])
+                self.cameras[cam_string].api_CV2_Camera_Create_Instance("/dev/video{}".format(self.available_cameras[counter]))
             else:
                 self.cameras[cam_string].api_CV2_Camera_Create_Instance(self.available_cameras[counter], extra_params = [cv2.CAP_MSMF])
 
