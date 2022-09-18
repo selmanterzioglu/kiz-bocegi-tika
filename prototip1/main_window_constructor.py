@@ -42,7 +42,7 @@ class kiz_UI(Structure_UI):
         self.specialFunction = specialFunction()
         
         self.first_usage = False
-        self.simulation_mode = True
+        self.simulation_mode = False
         
         self.init()
     
@@ -61,6 +61,8 @@ class kiz_UI(Structure_UI):
             if (self.arduino_serial.arduino == None):
                 self.set_statusbar_string("Arduino is not found. ! ")
             else: 
+                self.gui_widgets["label_device_port"].setText("Device Port: {}".format(self.arduino_serial.port))
+                
                 self.arduino_serial_recieve_data = None
                 self.arduino_frontend_distance = 0
                 self.arduino_backend_distance = 0
@@ -184,6 +186,7 @@ class kiz_UI(Structure_UI):
         self.gui_widgets["label_backend_distance"] = self.label_backend_distance
         self.gui_widgets["label_motors_lock"] = self.label_motors_lock
         self.gui_widgets["label_route"] = self.label_route
+        self.gui_widgets["label_device_port"] = self.label_device_port
 
     def init_gui_thread(self, trigger_pause=None, trigger_quit=None, number_of_snapshot=-1, delay=0.001, trigger_before=None, trigger_after=None):
         cpu_percent = "Used CPU: {}".format(self.system_o.cpu_percent_Psutil())        
@@ -288,7 +291,7 @@ class kiz_UI(Structure_UI):
 
     def camera_qtimer_creater_runner(self):
         if self.available_cameras_counter == 0:
-            print("your camera/s is not available")
+            print("[WARNING]: Your camera/s is not available")
         else:    
             if self.available_cameras_counter >= 1:
                 self.q_timers["camera_1_renderer"] = qt_tools.qtimer_Create_And_Run(

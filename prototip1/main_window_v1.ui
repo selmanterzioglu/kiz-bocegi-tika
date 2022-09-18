@@ -325,6 +325,18 @@
          </property>
         </widget>
        </item>
+       <item row="6" column="0">
+        <widget class="QLabel" name="label_device_port">
+         <property name="font">
+          <font>
+           <pointsize>10</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>Device Port: None</string>
+         </property>
+        </widget>
+       </item>
       </layout>
      </widget>
     </item>
@@ -336,7 +348,7 @@
      <x>0</x>
      <y>0</y>
      <width>1364</width>
-     <height>26</height>
+     <height>18</height>
     </rect>
    </property>
   </widget>
