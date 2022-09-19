@@ -260,7 +260,7 @@ class kiz_UI(Structure_UI):
         Buffer_Dict_keys  = list(self.Buffer_Dict.keys())
         for i in Buffer_Dict_keys:
             del self.Buffer_Dict[i]
-        
+        self.camera_Remove()
         # self.available_cameras = None
         # self.available_cameras_counter = 0
 
@@ -377,7 +377,7 @@ class kiz_UI(Structure_UI):
             # if (self.specialFunction.get_os_platform == "win32"):
             #     self.cameras[cam_string].api_CV2_Camera_Create_Instance(self.available_cameras[counter], extra_params = [cv2.CAP_V4L2])
             if (self.specialFunction.get_os_platform() == "linux" or self.specialFunction.get_os_platform() == "linux2"):
-                self.cameras[cam_string].api_CV2_Camera_Create_Instance("/dev/video{}".format(self.available_cameras[counter]))
+                self.cameras[cam_string].api_CV2_Camera_Create_Instance("/dev/video{}".format(self.available_cameras[counter]), extra_params = [cv2.CAP_V4L2])
             else:
                 self.cameras[cam_string].api_CV2_Camera_Create_Instance(self.available_cameras[counter], extra_params = [cv2.CAP_MSMF])
 
@@ -477,7 +477,7 @@ class kiz_UI(Structure_UI):
                 if (self.specialFunction.get_os_platform() == "win32"):
                     camera = cv2.VideoCapture(source, cv2.CAP_MSMF)
                 else:
-                    camera = cv2.VideoCapture("/dev/video{}".format(source))
+                    camera = cv2.VideoCapture("/dev/video{}".format(source), cv2.CAP_V4L2)
 
                 is_reading, img = camera.read()
                 if camera.isOpened() and is_reading is True:
